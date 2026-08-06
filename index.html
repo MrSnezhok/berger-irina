@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
     </script>
     <style>
+        /* ===== БАЗОВЫЕ СТИЛИ ===== */
         * {
             margin: 0;
             padding: 0;
@@ -18,8 +19,236 @@
             background-color: #1a1a1a;
             color: #f0f0f0;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        /* ===== ПАДАЮЩИЕ ПРЕДМЕТЫ ===== */
+        .falling-item {
+            position: fixed;
+            font-size: 60px;
+            pointer-events: none;
+            z-index: 9999;
+            animation: fall linear forwards;
+            user-select: none;
+            opacity: 0.9;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* ===== СООБЩЕНИЕ ИВЕНТА ===== */
+        .event-message-banner {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #ff6b00, #ffcc00);
+            color: #000;
+            padding: 16px 40px;
+            border-radius: 60px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            z-index: 9998;
+            box-shadow: 0 0 60px rgba(255, 204, 0, 0.5);
+            border: 2px solid #fff;
+            text-align: center;
+            max-width: 90%;
+            animation: messagePulse 0.5s ease;
+            display: none;
+        }
+
+        @keyframes messagePulse {
+            0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
+            50% { transform: translateX(-50%) scale(1.1); }
+            100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+
+        /* ===== ОНЛАЙН-СТАТУС ===== */
+        .online-section {
+            background: #1a1a1a;
+            border-radius: 30px;
+            padding: 16px 20px;
+            margin: 20px 0 30px;
+            border: 1px solid #333;
+        }
+
+        .online-section .online-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .online-section .online-title {
+            color: #ffcc00;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .online-section .online-count {
+            background: #0d0d0d;
+            padding: 4px 18px;
+            border-radius: 60px;
+            border: 1px solid #4caf50;
+            color: #4caf50;
+            font-weight: 700;
+        }
+
+        .online-users-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .online-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #222;
+            padding: 6px 14px 6px 6px;
+            border-radius: 60px;
+            border: 1px solid #333;
+        }
+
+        .online-user img {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #4caf50;
+        }
+
+        .online-user .online-name {
+            color: #ddd;
+            font-size: 0.9rem;
+        }
+
+        .online-user .privilege-icon-sm {
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+        }
+
+        /* ===== АДМИН-ПАНЕЛЬ ===== */
+        .admin-panel {
+            background: #1f1f1f;
+            border-radius: 30px;
+            padding: 20px;
+            margin: 20px 0 30px;
+            border: 2px solid #ffcc00;
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .admin-panel h3 {
+            color: #ffcc00;
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+        }
+
+        .admin-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        .admin-row label {
+            color: #aaa;
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .admin-row input,
+        .admin-row textarea {
+            flex: 1;
+            min-width: 150px;
+            padding: 10px 16px;
+            border-radius: 60px;
+            border: 1px solid #444;
+            background: #121212;
+            color: #f0f0f0;
+            font-size: 0.95rem;
+        }
+
+        .admin-row textarea {
+            border-radius: 20px;
+            min-height: 50px;
+            resize: vertical;
+        }
+
+        .admin-row .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .admin-row .btn:active {
+            transform: scale(0.94);
+        }
+
+        .btn-event {
+            background: #ff6b00;
+            color: #fff;
+        }
+        .btn-event:hover {
+            background: #ff8800;
+        }
+
+        .btn-event-active {
+            background: #ff0000;
+            color: #fff;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 0, 0, 0.6); }
+        }
+
+        .btn-score {
+            background: #4caf50;
+            color: #fff;
+        }
+        .btn-score:hover {
+            background: #5dbf62;
+        }
+
+        .btn-danger {
+            background: #b4534a;
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #c85f55;
+        }
+
+        /* ===== ОСТАЛЬНЫЕ СТИЛИ (из предыдущей версии) ===== */
         header {
             background: linear-gradient(135deg, #333333, #000000);
             padding: 30px 20px 24px;
@@ -202,6 +431,171 @@
             pointer-events: none;
         }
 
+        .total-score {
+            background: #1a1a1a;
+            border-radius: 30px;
+            padding: 16px 20px;
+            margin: 20px 0 30px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .total-score .total-label {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        .total-score .total-value {
+            color: #ffcc00;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-left: 12px;
+        }
+
+        /* ===== ЛИДЕРБОРД ===== */
+        .leaderboard-wrap {
+            background: #1a1a1a;
+            border-radius: 30px;
+            padding: 6px 6px 16px;
+            border: 1px solid #333;
+            margin: 30px 0;
+        }
+
+        .leaderboard-wrap h3 {
+            color: #ffcc00;
+            text-align: center;
+            padding: 14px 0 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .table-scroll {
+            max-height: 400px;
+            overflow-y: auto;
+            border-radius: 24px;
+            background: #111;
+            padding: 2px;
+            scrollbar-width: thin;
+            scrollbar-color: #ffcc00 #2a2a2a;
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .table-scroll::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 12px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #ffcc00;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        th {
+            background: #1a1a1a;
+            color: #ffcc00;
+            padding: 12px 14px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            font-weight: 600;
+            border-bottom: 2px solid #333;
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #2a2a2a;
+            color: #ccc;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr.top1 td {
+            color: #ffd700;
+            font-weight: 700;
+        }
+        tr.top2 td {
+            color: #c0c0c0;
+            font-weight: 600;
+        }
+        tr.top3 td {
+            color: #cd7f32;
+            font-weight: 600;
+        }
+
+        .empty-message {
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .medal {
+            font-size: 1.4rem;
+            margin-right: 6px;
+        }
+
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #444;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .user-avatar-small:hover {
+            border-color: #ffcc00;
+            transform: scale(1.1);
+        }
+
+        .privilege-icon {
+            width: 20px;
+            height: 20px;
+            margin: 0 1px;
+            vertical-align: middle;
+            filter: drop-shadow(0 0 4px rgba(255, 204, 0, 0.2));
+        }
+
+        .user-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .user-name-cell .username {
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .user-name-cell .username:hover {
+            color: #ffcc00;
+        }
+
+        .privileges-inline {
+            display: inline-flex;
+            gap: 2px;
+            align-items: center;
+        }
+
+        /* ===== АВТОРИЗАЦИЯ ===== */
         .auth-section {
             background: #1f1f1f;
             border-radius: 30px;
@@ -387,291 +781,6 @@
             background: #c85f55;
         }
 
-        .total-score {
-            background: #1a1a1a;
-            border-radius: 30px;
-            padding: 16px 20px;
-            margin: 20px 0 30px;
-            border: 1px solid #333;
-            text-align: center;
-        }
-
-        .total-score .total-label {
-            color: #aaa;
-            font-size: 1.1rem;
-        }
-
-        .total-score .total-value {
-            color: #ffcc00;
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-left: 12px;
-        }
-
-        /* ===== ЛИДЕРБОРД ===== */
-        .leaderboard-wrap {
-            background: #1a1a1a;
-            border-radius: 30px;
-            padding: 6px 6px 16px;
-            border: 1px solid #333;
-            margin: 30px 0;
-        }
-
-        .leaderboard-wrap h3 {
-            color: #ffcc00;
-            text-align: center;
-            padding: 14px 0 8px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .table-scroll {
-            max-height: 400px;
-            overflow-y: auto;
-            border-radius: 24px;
-            background: #111;
-            padding: 2px;
-            scrollbar-width: thin;
-            scrollbar-color: #ffcc00 #2a2a2a;
-        }
-
-        .table-scroll::-webkit-scrollbar {
-            width: 6px;
-        }
-        .table-scroll::-webkit-scrollbar-track {
-            background: #1a1a1a;
-            border-radius: 12px;
-        }
-        .table-scroll::-webkit-scrollbar-thumb {
-            background: #ffcc00;
-            border-radius: 12px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-            text-align: left;
-        }
-
-        th {
-            background: #1a1a1a;
-            color: #ffcc00;
-            padding: 12px 14px;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-            font-weight: 600;
-            border-bottom: 2px solid #333;
-        }
-
-        td {
-            padding: 10px 14px;
-            border-bottom: 1px solid #2a2a2a;
-            color: #ccc;
-            vertical-align: middle;
-        }
-
-        tr:last-child td {
-            border-bottom: none;
-        }
-
-        tr.top1 td {
-            color: #ffd700;
-            font-weight: 700;
-        }
-        tr.top2 td {
-            color: #c0c0c0;
-            font-weight: 600;
-        }
-        tr.top3 td {
-            color: #cd7f32;
-            font-weight: 600;
-        }
-
-        .empty-message {
-            padding: 20px;
-            color: #666;
-            font-style: italic;
-            text-align: center;
-        }
-
-        .medal {
-            font-size: 1.4rem;
-            margin-right: 6px;
-        }
-
-        .user-avatar-small {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #444;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .user-avatar-small:hover {
-            border-color: #ffcc00;
-            transform: scale(1.1);
-        }
-
-        .privilege-icon {
-            width: 20px;
-            height: 20px;
-            margin: 0 1px;
-            vertical-align: middle;
-            filter: drop-shadow(0 0 4px rgba(255, 204, 0, 0.2));
-        }
-
-        .user-name-cell {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .user-name-cell .username {
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .user-name-cell .username:hover {
-            color: #ffcc00;
-        }
-
-        .privileges-inline {
-            display: inline-flex;
-            gap: 2px;
-            align-items: center;
-        }
-
-        /* ===== ПРОФИЛЬ ===== */
-        .profile-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .profile-modal.active {
-            display: flex;
-        }
-
-        .profile-card {
-            background: #222;
-            border-radius: 30px;
-            padding: 40px;
-            max-width: 500px;
-            width: 100%;
-            border: 2px solid #ffcc00;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .profile-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 2rem;
-            color: #aaa;
-            cursor: pointer;
-            transition: 0.2s;
-            background: none;
-            border: none;
-        }
-
-        .profile-close:hover {
-            color: #ffcc00;
-            transform: rotate(90deg);
-        }
-
-        .profile-avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #ffcc00;
-            margin: 0 auto 20px;
-            display: block;
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
-        }
-
-        .profile-name {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #ffcc00;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .profile-privileges {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin: 12px 0;
-            flex-wrap: wrap;
-        }
-
-        .profile-privilege {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #1a1a1a;
-            padding: 6px 14px;
-            border-radius: 60px;
-            border: 1px solid #444;
-            font-size: 0.85rem;
-        }
-
-        .profile-privilege img {
-            width: 24px;
-            height: 24px;
-        }
-
-        .profile-description {
-            text-align: center;
-            color: #ccc;
-            font-size: 1.1rem;
-            margin: 16px 0;
-            padding: 16px;
-            background: #1a1a1a;
-            border-radius: 16px;
-            border: 1px solid #333;
-        }
-
-        .profile-score {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #aaa;
-        }
-
-        .profile-score span {
-            color: #ffcc00;
-            font-weight: 700;
-            font-size: 1.6rem;
-        }
-
         /* ===== ЧАТ ===== */
         .chat-section {
             background: #1a1a1a;
@@ -819,6 +928,128 @@
             background: #e6b800;
         }
 
+        /* ===== ПРОФИЛЬ ===== */
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .profile-modal.active {
+            display: flex;
+        }
+
+        .profile-card {
+            background: #222;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            border: 2px solid #ffcc00;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .profile-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            color: #aaa;
+            cursor: pointer;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+
+        .profile-close:hover {
+            color: #ffcc00;
+            transform: rotate(90deg);
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ffcc00;
+            margin: 0 auto 20px;
+            display: block;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+        }
+
+        .profile-name {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffcc00;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .profile-privileges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .profile-privilege {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #1a1a1a;
+            padding: 6px 14px;
+            border-radius: 60px;
+            border: 1px solid #444;
+            font-size: 0.85rem;
+        }
+
+        .profile-privilege img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .profile-description {
+            text-align: center;
+            color: #ccc;
+            font-size: 1.1rem;
+            margin: 16px 0;
+            padding: 16px;
+            background: #1a1a1a;
+            border-radius: 16px;
+            border: 1px solid #333;
+        }
+
+        .profile-score {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+
+        .profile-score span {
+            color: #ffcc00;
+            font-weight: 700;
+            font-size: 1.6rem;
+        }
+
+        /* ===== ГАЛЕРЕЯ ===== */
         .gallery-title {
             text-align: center;
             font-size: 2.5rem;
@@ -941,10 +1172,21 @@
                 width: 16px;
                 height: 16px;
             }
+            .event-message-banner {
+                font-size: 1rem;
+                padding: 12px 20px;
+                top: 70px;
+            }
+            .falling-item {
+                font-size: 40px;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- ===== БАННЕР СООБЩЕНИЯ ИВЕНТА ===== -->
+    <div class="event-message-banner" id="eventBanner"></div>
 
     <header>
         <h1>
@@ -983,16 +1225,52 @@
 
         <div class="clicker-section">
             <h3>🍔 НАЖМИ НА БУРГЕР</h3>
-            <div class="clicker-sub">Каждый клик — +1 бургер в копилку Ирины</div>
+            <div class="clicker-sub" id="clickerSub">Каждый клик — +1 бургер в копилку Ирины</div>
             <div class="burger-wrapper" id="burgerClicker">
                 <div class="burger-score-overlay" id="burgerOverlay">0</div>
                 <img src="burger.png" alt="Бургер" id="burgerImg" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23d49c6c%22/%3E%3Ctext x=%2225%22 y=%2265%22 font-size=%2232%22 fill=%22%233d2b1a%22%3E🍔%3C/text%3E%3C/svg%3E'">
             </div>
         </div>
 
+        <!-- ===== ОНЛАЙН ===== -->
+        <div class="online-section">
+            <div class="online-header">
+                <span class="online-title">🟢 Онлайн</span>
+                <span class="online-count" id="onlineCount">0</span>
+            </div>
+            <div class="online-users-list" id="onlineUsersList">
+                <span class="empty-message">Загрузка...</span>
+            </div>
+        </div>
+
         <div class="total-score">
             <span class="total-label">🌍 Всего бургеров натапано в мире:</span>
             <span class="total-value" id="totalScoreDisplay">0</span>
+        </div>
+
+        <!-- ===== АДМИН-ПАНЕЛЬ ===== -->
+        <div class="admin-panel" id="adminPanel">
+            <h3>🔧 Админ-панель (Creator)</h3>
+            <div class="admin-row">
+                <label>💰 Бургеров:</label>
+                <input type="number" id="adminScoreInput" value="0" min="0">
+                <button class="btn btn-score" id="adminSetScoreBtn">Установить</button>
+                <button class="btn btn-score" id="adminAddScoreBtn">+1000</button>
+            </div>
+            <div class="admin-row">
+                <label>🎮 Ивент:</label>
+                <button class="btn btn-event" id="adminStartEventBtn">▶️ Запустить ивент</button>
+                <button class="btn btn-danger" id="adminStopEventBtn">⏹️ Остановить</button>
+            </div>
+            <div class="admin-row">
+                <label>📢 Сообщение:</label>
+                <input type="text" id="adminMessageInput" placeholder="Текст для всех..." maxlength="100">
+                <button class="btn" id="adminSendMessageBtn" style="background:#ffcc00;color:#000;">Отправить</button>
+            </div>
+            <div class="admin-row">
+                <label>📊 Статус:</label>
+                <span id="adminEventStatus" style="color:#aaa;">Ивент не активен</span>
+            </div>
         </div>
 
         <div class="auth-section" id="authSection">
@@ -1059,7 +1337,7 @@
             </div>
         </div>
 
-        <!-- ===== ПРОФИЛЬ (МОДАЛКА) ===== -->
+        <!-- ===== ПРОФИЛЬ ===== -->
         <div class="profile-modal" id="profileModal">
             <div class="profile-card">
                 <button class="profile-close" id="profileCloseBtn">✕</button>
@@ -1237,6 +1515,10 @@
 
             let currentUser = null;
             let currentScore = 0;
+            let eventActive = false;
+            let eventMultiplier = 1;
+            let fallingInterval = null;
+            let audioPlayer = null;
             const STORAGE_KEY = 'burger_irina_session';
 
             // DOM
@@ -1254,8 +1536,18 @@
             const settingsAvatar = document.getElementById('settingsAvatar');
             const chatMessages = document.getElementById('chatMessages');
             const chatInput = document.getElementById('chatInput');
+            const onlineCount = document.getElementById('onlineCount');
+            const onlineUsersList = document.getElementById('onlineUsersList');
+            const eventBanner = document.getElementById('eventBanner');
+            const clickerSub = document.getElementById('clickerSub');
 
-            // Profile modal
+            // Admin
+            const adminPanel = document.getElementById('adminPanel');
+            const adminScoreInput = document.getElementById('adminScoreInput');
+            const adminEventStatus = document.getElementById('adminEventStatus');
+            const adminMessageInput = document.getElementById('adminMessageInput');
+
+            // Profile
             const profileModal = document.getElementById('profileModal');
             const profileCloseBtn = document.getElementById('profileCloseBtn');
             const profileAvatar = document.getElementById('profileAvatar');
@@ -1264,14 +1556,13 @@
             const profileDescription = document.getElementById('profileDescription');
             const profileScore = document.getElementById('profileScore');
 
-            // Privilege icons mapping
+            // Privilege icons
             const PRIVILEGE_ICONS = {
                 'burger': 'burger.png',
                 'verified': 'verified.png',
                 'vip': 'vip.png',
                 'creator': 'creator.png'
             };
-
             const PRIVILEGE_NAMES = {
                 'burger': '🍔 Бургер',
                 'verified': '✅ Верифицирован',
@@ -1279,15 +1570,16 @@
                 'creator': '⭐ Создатель'
             };
 
-            function getPrivilegeIcon(privilege) {
-                return PRIVILEGE_ICONS[privilege] || '';
-            }
+            const FALLING_ITEMS = ['chainik.jpg', 'chekuska.jpg', 'kirieshki.jpg', 'mellstroy.jpg'];
+
+            function getPrivilegeIcon(p) { return PRIVILEGE_ICONS[p] || ''; }
 
             function renderPrivilegesInline(privileges) {
                 if (!privileges || privileges.length === 0) return '';
                 return privileges.map(p => {
                     const icon = getPrivilegeIcon(p);
-                    return icon ? `<img src="${icon}" class="privilege-icon" title="${PRIVILEGE_NAMES[p] || p}" alt="${p}">` : '';
+                    return icon ? `<img src="${icon}" class="privilege-icon" title="${PRIVILEGE_NAMES[p] || p}" alt="${p}">` :
+                        '';
                 }).join('');
             }
 
@@ -1306,7 +1598,8 @@
                 if (!privileges || privileges.length === 0) return '';
                 return privileges.map(p => {
                     const icon = getPrivilegeIcon(p);
-                    return icon ? `<img src="${icon}" class="privilege-icon-sm" title="${PRIVILEGE_NAMES[p] || p}" alt="${p}">` : '';
+                    return icon ? `<img src="${icon}" class="privilege-icon-sm" title="${PRIVILEGE_NAMES[p] || p}" alt="${p}">` :
+                        '';
                 }).join('');
             }
 
@@ -1328,6 +1621,160 @@
             function showAuthBlock(show) {
                 authBlock.style.display = show ? 'block' : 'none';
                 accountSettings.classList.toggle('active', !show);
+            }
+
+            // ===== ОНЛАЙН =====
+            async function updateOnlineStatus() {
+                if (!currentUser) return;
+                try {
+                    await supabase
+                        .from('online_users')
+                        .upsert({
+                            user_id: currentUser.id,
+                            username: currentUser.name,
+                            last_seen: new Date().toISOString()
+                        }, { onConflict: 'user_id' });
+                } catch (e) { console.error(e); }
+            }
+
+            async function loadOnlineUsers() {
+                try {
+                    // Clean old users first
+                    await supabase
+                        .from('online_users')
+                        .delete()
+                        .lt('last_seen', new Date(Date.now() - 30000).toISOString());
+
+                    const { data, error } = await supabase
+                        .from('online_users')
+                        .select('user_id, username')
+                        .order('last_seen', { ascending: false });
+
+                    if (error) { console.error(error); return; }
+                    if (data) {
+                        onlineCount.textContent = data.length;
+                        if (data.length === 0) {
+                            onlineUsersList.innerHTML = '<span style="color:#666;">Никого нет в онлайне</span>';
+                        } else {
+                            onlineUsersList.innerHTML = data.map(u => `
+                                <div class="online-user">
+                                    <img src="https://i.pravatar.cc/28?img=${u.user_id}" 
+                                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23333%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2230%22 y=%2265%22 font-size=%2240%22 fill=%22%23aaa%22%3E👤%3C/text%3E%3C/svg%3E'">
+                                    <span class="online-name">${u.username}</span>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                } catch (e) { console.error(e); }
+            }
+
+            // ===== ИВЕНТЫ =====
+            async function checkEventStatus() {
+                try {
+                    const { data, error } = await supabase
+                        .from('events')
+                        .select('is_active, started_by, message, multiplier')
+                        .order('id', { ascending: false })
+                        .limit(1)
+                        .maybeSingle();
+
+                    if (error) { console.error(error); return; }
+                    if (data) {
+                        if (data.is_active && !eventActive) {
+                            startEvent(data.message, data.multiplier);
+                        } else if (!data.is_active && eventActive) {
+                            stopEvent();
+                        }
+                        if (adminEventStatus) {
+                            adminEventStatus.textContent = data.is_active ? `🟢 Активен (x${data.multiplier})` :
+                                '🔴 Не активен';
+                            adminEventStatus.style.color = data.is_active ? '#4caf50' : '#aaa';
+                        }
+                    }
+                } catch (e) { console.error(e); }
+            }
+
+            function startEvent(message, multiplier) {
+                eventActive = true;
+                eventMultiplier = multiplier || 2;
+                clickerSub.textContent = `🎉 ИВЕНТ! x${eventMultiplier} бургеров за клик!`;
+
+                // Показываем баннер
+                if (message) {
+                    eventBanner.textContent = message;
+                    eventBanner.style.display = 'block';
+                    setTimeout(() => {
+                        eventBanner.style.display = 'none';
+                    }, 5000);
+                }
+
+                // Запускаем падающие предметы
+                if (fallingInterval) clearInterval(fallingInterval);
+                fallingInterval = setInterval(() => {
+                    createFallingItem();
+                }, 300);
+
+                // Пробуем запустить музыку
+                try {
+                    if (audioPlayer) {
+                        audioPlayer.pause();
+                        audioPlayer = null;
+                    }
+                    audioPlayer = new Audio('event.mp3');
+                    audioPlayer.loop = true;
+                    audioPlayer.volume = 0.5;
+                    audioPlayer.play().catch(e => console.log('Music play error:', e));
+                } catch (e) { console.log('Audio error:', e); }
+
+                // Показываем статус в админке
+                if (adminEventStatus) {
+                    adminEventStatus.textContent = `🟢 Активен (x${eventMultiplier})`;
+                    adminEventStatus.style.color = '#4caf50';
+                    document.getElementById('adminStartEventBtn').textContent = '▶️ Ивент активен';
+                    document.getElementById('adminStartEventBtn').classList.add('btn-event-active');
+                }
+            }
+
+            function stopEvent() {
+                eventActive = false;
+                eventMultiplier = 1;
+                clickerSub.textContent = 'Каждый клик — +1 бургер в копилку Ирины';
+
+                if (fallingInterval) {
+                    clearInterval(fallingInterval);
+                    fallingInterval = null;
+                }
+
+                if (audioPlayer) {
+                    audioPlayer.pause();
+                    audioPlayer = null;
+                }
+
+                // Убираем баннер
+                eventBanner.style.display = 'none';
+
+                // Убираем все падающие предметы
+                document.querySelectorAll('.falling-item').forEach(el => el.remove());
+
+                if (adminEventStatus) {
+                    adminEventStatus.textContent = '🔴 Не активен';
+                    adminEventStatus.style.color = '#aaa';
+                    document.getElementById('adminStartEventBtn').textContent = '▶️ Запустить ивент';
+                    document.getElementById('adminStartEventBtn').classList.remove('btn-event-active');
+                }
+            }
+
+            function createFallingItem() {
+                const item = FALLING_ITEMS[Math.floor(Math.random() * FALLING_ITEMS.length)];
+                const el = document.createElement('div');
+                el.className = 'falling-item';
+                el.innerHTML = `<img src="${item}" style="width:60px;height:60px;object-fit:contain;" 
+                                   onerror="this.style.display='none';this.parentElement.textContent='🎁'">`;
+                el.style.left = Math.random() * 90 + '%';
+                el.style.animationDuration = (3 + Math.random() * 4) + 's';
+                el.style.fontSize = (40 + Math.random() * 40) + 'px';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 7000);
             }
 
             // ===== ЛИДЕРБОРД =====
@@ -1468,7 +1915,7 @@
                 } catch (e) { console.error(e); }
             }
 
-            // ===== ПРОФИЛЬ (модалка) =====
+            // ===== ПРОФИЛЬ =====
             async function showProfile(userId) {
                 try {
                     const { data, error } = await supabase
@@ -1483,7 +1930,6 @@
                     openProfile(data);
                 } catch (e) { console.error(e); }
             }
-
             window.showProfile = showProfile;
 
             async function showProfileByName(username) {
@@ -1500,7 +1946,6 @@
                     openProfile(data);
                 } catch (e) { console.error(e); }
             }
-
             window.showProfileByName = showProfileByName;
 
             function openProfile(user) {
@@ -1519,7 +1964,6 @@
             profileCloseBtn.addEventListener('click', () => {
                 profileModal.classList.remove('active');
             });
-
             profileModal.addEventListener('click', (e) => {
                 if (e.target === profileModal) {
                     profileModal.classList.remove('active');
@@ -1574,6 +2018,8 @@
                     refreshLeaderboard();
                     refreshTotalScore();
                     loadChat();
+                    updateOnlineStatus();
+                    checkAdminPanel();
                     return true;
                 } catch (e) { console.error(e);
                     setAuthStatus('❌ Исключение', false); return false; }
@@ -1614,6 +2060,8 @@
                     refreshLeaderboard();
                     refreshTotalScore();
                     loadChat();
+                    updateOnlineStatus();
+                    checkAdminPanel();
                     return true;
                 } catch (e) { console.error(e);
                     setAuthStatus('❌ Исключение', false); return false; }
@@ -1626,6 +2074,7 @@
                 setAuthStatus('⚪ Вы вышли');
                 localStorage.removeItem(STORAGE_KEY);
                 showAuthBlock(true);
+                adminPanel.classList.remove('active');
                 refreshLeaderboard();
                 refreshTotalScore();
                 loadChat();
@@ -1695,6 +2144,105 @@
                     setSettingsStatus('❌ Исключение', false); return false; }
             }
 
+            // ===== АДМИН-ПАНЕЛЬ =====
+            function checkAdminPanel() {
+                if (currentUser && currentUser.privileges && currentUser.privileges.includes('creator')) {
+                    adminPanel.classList.add('active');
+                } else {
+                    adminPanel.classList.remove('active');
+                }
+            }
+
+            async function adminSetScore() {
+                if (!currentUser || !currentUser.privileges.includes('creator')) return;
+                const val = parseInt(adminScoreInput.value);
+                if (isNaN(val) || val < 0) return;
+                try {
+                    const { error } = await supabase
+                        .from('user_scores')
+                        .update({ score: val })
+                        .eq('id', currentUser.id);
+                    if (error) { console.error(error);
+                        alert('Ошибка'); return; }
+                    currentScore = val;
+                    currentUser.score = val;
+                    updateScoreUI();
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+                    refreshLeaderboard();
+                    refreshTotalScore();
+                    alert(`✅ Счёт установлен на ${val}`);
+                } catch (e) { console.error(e); }
+            }
+
+            async function adminAddScore() {
+                if (!currentUser || !currentUser.privileges.includes('creator')) return;
+                const add = 1000;
+                try {
+                    const newScore = currentScore + add;
+                    const { error } = await supabase
+                        .from('user_scores')
+                        .update({ score: newScore })
+                        .eq('id', currentUser.id);
+                    if (error) { console.error(error);
+                        alert('Ошибка'); return; }
+                    currentScore = newScore;
+                    currentUser.score = newScore;
+                    updateScoreUI();
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+                    refreshLeaderboard();
+                    refreshTotalScore();
+                } catch (e) { console.error(e); }
+            }
+
+            async function adminStartEvent() {
+                if (!currentUser || !currentUser.privileges.includes('creator')) return;
+                const message = adminMessageInput.value.trim() || '🎉 БУРГЕР-МАНИЯ! x2 клики!';
+                try {
+                    const { error } = await supabase
+                        .from('events')
+                        .insert({
+                            is_active: true,
+                            started_by: currentUser.name,
+                            message: message,
+                            multiplier: 2
+                        });
+                    if (error) { console.error(error);
+                        alert('Ошибка'); return; }
+                    startEvent(message, 2);
+                    alert('✅ Ивент запущен!');
+                } catch (e) { console.error(e); }
+            }
+
+            async function adminStopEvent() {
+                if (!currentUser || !currentUser.privileges.includes('creator')) return;
+                try {
+                    const { error } = await supabase
+                        .from('events')
+                        .insert({
+                            is_active: false,
+                            started_by: currentUser.name,
+                            message: '',
+                            multiplier: 1
+                        });
+                    if (error) { console.error(error);
+                        alert('Ошибка'); return; }
+                    stopEvent();
+                    alert('⏹️ Ивент остановлен');
+                } catch (e) { console.error(e); }
+            }
+
+            async function adminSendGlobalMessage() {
+                if (!currentUser || !currentUser.privileges.includes('creator')) return;
+                const msg = adminMessageInput.value.trim();
+                if (!msg) { alert('Введите сообщение'); return; }
+
+                eventBanner.textContent = msg;
+                eventBanner.style.display = 'block';
+                setTimeout(() => {
+                    eventBanner.style.display = 'none';
+                }, 5000);
+            }
+
             // ===== АВТОСОХРАНЕНИЕ =====
             let saveTimeout = null;
 
@@ -1717,7 +2265,8 @@
 
             // ===== ОБРАБОТЧИКИ =====
             burger.addEventListener('click', () => {
-                currentScore += 1;
+                const add = eventActive ? eventMultiplier : 1;
+                currentScore += add;
                 updateScoreUI();
 
                 if (saveTimeout) clearTimeout(saveTimeout);
@@ -1745,6 +2294,13 @@
             chatInput.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') sendMessage();
             });
+
+            // Admin
+            document.getElementById('adminSetScoreBtn').addEventListener('click', adminSetScore);
+            document.getElementById('adminAddScoreBtn').addEventListener('click', adminAddScore);
+            document.getElementById('adminStartEventBtn').addEventListener('click', adminStartEvent);
+            document.getElementById('adminStopEventBtn').addEventListener('click', adminStopEvent);
+            document.getElementById('adminSendMessageBtn').addEventListener('click', adminSendGlobalMessage);
 
             // ===== ВОССТАНОВЛЕНИЕ СЕССИИ =====
             async function restoreSession() {
@@ -1781,6 +2337,9 @@
                         refreshLeaderboard();
                         refreshTotalScore();
                         loadChat();
+                        updateOnlineStatus();
+                        checkAdminPanel();
+                        checkEventStatus();
                     } catch (e) {
                         console.warn('Ошибка восстановления сессии');
                         localStorage.removeItem(STORAGE_KEY);
@@ -1794,26 +2353,37 @@
                     refreshLeaderboard();
                     refreshTotalScore();
                     loadChat();
+                    checkEventStatus();
                 }
             }
 
             // ===== ИНИЦИАЛИЗАЦИЯ =====
             restoreSession();
 
+            // Обновление онлайн статуса
+            setInterval(() => {
+                updateOnlineStatus();
+                loadOnlineUsers();
+            }, 5000);
+
             setInterval(autoSave, 15000);
             setInterval(() => {
                 refreshLeaderboard();
                 refreshTotalScore();
+                checkEventStatus();
             }, 30000);
             setInterval(loadChat, 10000);
 
             window.addEventListener('load', () => {
                 if (currentUser) {
                     loadSettings();
+                    updateOnlineStatus();
                 }
                 refreshLeaderboard();
                 refreshTotalScore();
                 loadChat();
+                loadOnlineUsers();
+                checkEventStatus();
             });
 
         })();
