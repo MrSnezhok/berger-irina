@@ -524,9 +524,9 @@
         .privilege-icon {
             width: 20px;
             height: 20px;
-            margin: 0 2px;
+            margin: 0 1px;
             vertical-align: middle;
-            filter: drop-shadow(0 0 4px rgba(255, 204, 0, 0.3));
+            filter: drop-shadow(0 0 4px rgba(255, 204, 0, 0.2));
         }
 
         .user-name-cell {
@@ -536,10 +536,19 @@
             flex-wrap: wrap;
         }
 
-        .privileges-cell {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
+        .user-name-cell .username {
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .user-name-cell .username:hover {
+            color: #ffcc00;
+        }
+
+        .privileges-inline {
+            display: inline-flex;
+            gap: 2px;
+            align-items: center;
         }
 
         /* ===== ПРОФИЛЬ ===== */
@@ -741,6 +750,14 @@
             flex-wrap: wrap;
         }
 
+        .chat-username .username {
+            cursor: pointer;
+        }
+
+        .chat-username .username:hover {
+            text-decoration: underline;
+        }
+
         .chat-username .privilege-icon-sm {
             width: 16px;
             height: 16px;
@@ -920,6 +937,10 @@
             .profile-name {
                 font-size: 1.5rem;
             }
+            .privilege-icon {
+                width: 16px;
+                height: 16px;
+            }
         }
     </style>
 </head>
@@ -1018,9 +1039,9 @@
             </h3>
             <div class="table-scroll">
                 <table>
-                    <thead><tr><th>#</th><th>Игрок</th><th>Привилегии</th><th>🍔</th></tr></thead>
+                    <thead><tr><th>#</th><th>Игрок</th><th>🍔</th></tr></thead>
                     <tbody id="leaderboardBody">
-                        <tr><td colspan="4" class="empty-message">Загрузка...</td></tr>
+                        <tr><td colspan="3" class="empty-message">Загрузка...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -1262,12 +1283,11 @@
                 return PRIVILEGE_ICONS[privilege] || '';
             }
 
-            function renderPrivileges(privileges) {
+            function renderPrivilegesInline(privileges) {
                 if (!privileges || privileges.length === 0) return '';
                 return privileges.map(p => {
                     const icon = getPrivilegeIcon(p);
-                    return icon ? `<img src="${icon}" class="privilege-icon" title="${PRIVILEGE_NAMES[p] || p}" alt="${p}">` :
-                        `<span class="privilege-icon">${PRIVILEGE_NAMES[p] || p}</span>`;
+                    return icon ? `<img src="${icon}" class="privilege-icon" title="${PRIVILEGE_NAMES[p] || p}" alt="${p}">` : '';
                 }).join('');
             }
 
@@ -1279,6 +1299,14 @@
                         ${icon ? `<img src="${icon}" alt="${p}">` : ''}
                         ${PRIVILEGE_NAMES[p] || p}
                     </div>`;
+                }).join('');
+            }
+
+            function renderPrivilegesChat(privileges) {
+                if (!privileges || privileges.length === 0) return '';
+                return privileges.map(p => {
+                    const icon = getPrivilegeIcon(p);
+                    return icon ? `<img src="${icon}" class="privilege-icon-sm" title="${PRIVILEGE_NAMES[p] || p}" alt="${p}">` : '';
                 }).join('');
             }
 
@@ -1320,7 +1348,7 @@
             function renderLeaderboard(rows) {
                 if (!rows || rows.length === 0) {
                     leaderboardBody.innerHTML =
-                    `<tr><td colspan="4" class="empty-message">📭 Нет записей</td></tr>`;
+                    `<tr><td colspan="3" class="empty-message">📭 Нет записей</td></tr>`;
                     return;
                 }
                 let html = '';
@@ -1339,12 +1367,8 @@
                                 <img src="${avatar}" class="user-avatar-small" 
                                      onclick="window.showProfile(${row.id})"
                                      onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23333%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2230%22 y=%2265%22 font-size=%2240%22 fill=%22%23aaa%22%3E👤%3C/text%3E%3C/svg%3E'">
-                                <strong onclick="window.showProfile(${row.id})" style="cursor:pointer;">${row.name || '—'}</strong>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="privileges-cell">
-                                ${renderPrivileges(privileges)}
+                                <span class="username" onclick="window.showProfile(${row.id})">${row.name || '—'}</span>
+                                <span class="privileges-inline">${renderPrivilegesInline(privileges)}</span>
                             </div>
                         </td>
                         <td>${row.score ?? 0}</td>
@@ -1404,11 +1428,8 @@
                              onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23333%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2230%22 y=%2265%22 font-size=%2240%22 fill=%22%23aaa%22%3E👤%3C/text%3E%3C/svg%3E'">
                         <div class="chat-content">
                             <div class="chat-username">
-                                ${msg.username || 'Аноним'}
-                                ${privileges.map(p => {
-                                    const icon = PRIVILEGE_ICONS[p];
-                                    return icon ? `<img src="${icon}" class="privilege-icon-sm" title="${PRIVILEGE_NAMES[p] || p}">` : '';
-                                }).join('')}
+                                <span class="username" onclick="window.showProfileByName('${msg.username}')">${msg.username || 'Аноним'}</span>
+                                ${renderPrivilegesChat(privileges)}
                                 <span class="chat-time">${time}</span>
                             </div>
                             <div class="chat-text">${msg.message || ''}</div>
