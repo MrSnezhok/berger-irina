@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🍔 Ирина Владимировна | Повелительница Бургеров</title>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
+    </script>
+    <style>
+        /* ===== ГЛОБАЛЬНЫЙ СТИЛЬ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            min-height: 100vh;
+        }
+
+        /* ===== ХЕДЕР ===== */
+        header {
+            background: linear-gradient(135deg, #333333, #000000);
+            padding: 30px 20px 24px;
+            text-align: center;
+            border-bottom: 3px solid #ffcc00;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 3.2rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #ffcc00;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        header h1 .burger-icon {
+            font-size: 2.8rem;
+            line-height: 1;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            margin-top: 8px;
+            color: #aaa;
+            border-top: 1px solid #444;
+            display: inline-block;
+            padding-top: 10px;
+        }
+
+        /* ===== СЧЁТ В ХЕДЕРЕ ===== */
+        .header-score {
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .header-score .score-box {
+            background: #0d0d0d;
+            padding: 8px 28px;
+            border-radius: 60px;
+            border: 1px solid #ffcc00;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffcc00;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px #ffcc0030;
+        }
+
+        .header-score .score-label {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        /* ===== КОНТЕЙНЕР ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ===== ГЕРОЙ ===== */
+        .hero {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px 0 40px;
+            background: #222;
+            border-radius: 30px;
+            padding: 30px;
+            border: 1px solid #333;
+        }
+
+        .hero-text {
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .hero-text h2 {
+            color: #ffcc00;
+            font-size: 2rem;
+            margin-bottom: 14px;
+        }
+
+        .hero-text p {
+            line-height: 1.7;
+            font-size: 1.05rem;
+            color: #ccc;
+            margin-bottom: 12px;
+        }
+
+        .hero-text .warning {
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        .hero-img {
+            flex: 1;
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .hero-img img {
+            max-width: 100%;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            border: 2px solid #555;
+            max-height: 400px;
+            object-fit: cover;
+        }
+
+        /* ===== БУРГЕР-КЛИКЕР ===== */
+        .clicker-section {
+            text-align: center;
+            margin: 30px 0 40px;
+            background: #222;
+            border-radius: 30px;
+            padding: 30px 20px;
+            border: 1px solid #333;
+            position: relative;
+        }
+
+        .clicker-section h3 {
+            color: #ffcc00;
+            font-size: 1.8rem;
+            margin-bottom: 6px;
+        }
+
+        .clicker-section .clicker-sub {
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .burger-wrapper {
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+            background: #1a1a1a;
+            padding: 16px 16px 10px 16px;
+            border-radius: 120px;
+            border: 2px solid #444;
+            box-shadow: 0 12px 0 #0a0a0a, 0 16px 40px rgba(0, 0, 0, 0.6);
+            transition: transform 0.08s ease;
+        }
+
+        .burger-wrapper:active {
+            transform: scale(0.92);
+            box-shadow: 0 6px 0 #0a0a0a, 0 12px 24px rgba(0, 0, 0, 0.7);
+        }
+
+        .burger-wrapper img {
+            display: block;
+            width: 160px;
+            height: auto;
+            filter: drop-shadow(0 6px 12px #00000080);
+            border-radius: 80px;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        /* ===== СЧЁТ НАД БУРГЕРОМ ===== */
+        .burger-score-overlay {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffcc00;
+            color: #000;
+            font-weight: 800;
+            font-size: 1.6rem;
+            padding: 4px 24px;
+            border-radius: 60px;
+            white-space: nowrap;
+            box-shadow: 0 4px 0 #b38f00, 0 6px 20px rgba(255, 204, 0, 0.3);
+            border: 1px solid #ffe066;
+            pointer-events: none;
+        }
+
+        /* ===== АВТОРИЗАЦИЯ / НАСТРОЙКИ ===== */
+        .auth-section {
+            background: #1f1f1f;
+            border-radius: 30px;
+            padding: 24px 20px;
+            margin: 30px 0;
+            border: 1px solid #333;
+            transition: all 0.3s;
+        }
+
+        .auth-section .auth-title {
+            color: #ffcc00;
+            font-size: 1.3rem;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+
+        .auth-form input {
+            padding: 14px 20px;
+            border-radius: 60px;
+            border: 1px solid #444;
+            background: #121212;
+            color: #f0f0f0;
+            font-size: 0.95rem;
+            min-width: 180px;
+            flex: 1 1 180px;
+            transition: 0.2s;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 0 3px #ffcc0030;
+        }
+
+        .auth-form input::placeholder {
+            color: #666;
+        }
+
+        .auth-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .auth-buttons .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auth-buttons .btn:active {
+            transform: scale(0.94);
+        }
+
+        .btn-reg {
+            background: #ffcc00;
+            color: #000;
+        }
+        .btn-reg:hover {
+            background: #e6b800;
+        }
+
+        .btn-login {
+            background: #555;
+            color: #fff;
+        }
+        .btn-login:hover {
+            background: #666;
+        }
+
+        .btn-logout {
+            background: #b4534a;
+            color: #fff;
+        }
+        .btn-logout:hover {
+            background: #c85f55;
+        }
+
+        .btn-save {
+            background: #4d8a5a;
+            color: #fff;
+        }
+        .btn-save:hover {
+            background: #5b9e6a;
+        }
+
+        .status {
+            background: #0d0d0d;
+            color: #ccc;
+            border-radius: 60px;
+            padding: 12px 20px;
+            margin-top: 16px;
+            text-align: center;
+            border-left: 4px solid #ffcc00;
+            border: 1px solid #2a2a2a;
+            font-size: 0.95rem;
+        }
+
+        /* ===== НАСТРОЙКИ АККАУНТА ===== */
+        .account-settings {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .account-settings.active {
+            display: flex;
+        }
+
+        .settings-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-row label {
+            color: #aaa;
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .settings-row input,
+        .settings-row textarea {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 18px;
+            border-radius: 60px;
+            border: 1px solid #444;
+            background: #121212;
+            color: #f0f0f0;
+            font-size: 0.95rem;
+            transition: 0.2s;
+        }
+
+        .settings-row textarea {
+            border-radius: 20px;
+            resize: vertical;
+            min-height: 60px;
+            font-family: inherit;
+        }
+
+        .settings-row input:focus,
+        .settings-row textarea:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 0 3px #ffcc0030;
+        }
+
+        .settings-row .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.1s;
+            background: #ffcc00;
+            color: #000;
+        }
+
+        .settings-row .btn:active {
+            transform: scale(0.94);
+        }
+
+        .settings-row .btn:hover {
+            background: #e6b800;
+        }
+
+        .settings-row .btn-danger {
+            background: #b4534a;
+            color: #fff;
+        }
+        .settings-row .btn-danger:hover {
+            background: #c85f55;
+        }
+
+        /* ===== ЛИДЕРБОРД (ТОП-10) ===== */
+        .leaderboard-wrap {
+            background: #1a1a1a;
+            border-radius: 30px;
+            padding: 6px 6px 16px;
+            border: 1px solid #333;
+            margin: 30px 0;
+        }
+
+        .leaderboard-wrap h3 {
+            color: #ffcc00;
+            text-align: center;
+            padding: 14px 0 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .leaderboard-wrap h3 .trophy {
+            font-size: 1.8rem;
+        }
+
+        .table-scroll {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 24px;
+            background: #111;
+            padding: 2px;
+            scrollbar-width: thin;
+            scrollbar-color: #ffcc00 #2a2a2a;
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .table-scroll::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 12px;
+        }
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: #ffcc00;
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        th {
+            background: #1a1a1a;
+            color: #ffcc00;
+            padding: 12px 14px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            font-weight: 600;
+            border-bottom: 2px solid #333;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #2a2a2a;
+            color: #ccc;
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr.top1 td {
+            color: #ffd700;
+            font-weight: 700;
+        }
+        tr.top2 td {
+            color: #c0c0c0;
+            font-weight: 600;
+        }
+        tr.top3 td {
+            color: #cd7f32;
+            font-weight: 600;
+        }
+
+        .empty-message {
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .medal {
+            font-size: 1.4rem;
+            margin-right: 6px;
+        }
+
+        .user-description {
+            color: #999;
+            font-size: 0.85rem;
+            font-style: italic;
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===== ГАЛЕРЕЯ ===== */
+        .gallery-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin: 50px 0 30px;
+            border-bottom: 2px solid #ffcc00;
+            padding-bottom: 20px;
+            display: inline-block;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #f0f0f0;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: #222;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            padding-bottom: 14px;
+            border: 1px solid #333;
+        }
+
+        .card:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 25px #ffcc0040;
+            border-color: #ffcc00;
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 2px solid #333;
+        }
+
+        .card h3 {
+            margin: 14px 0 4px;
+            color: #ffcc00;
+            font-size: 1rem;
+        }
+
+        .card p {
+            margin: 0;
+            color: #999;
+            font-size: 0.8rem;
+            padding: 0 12px;
+        }
+
+        /* ===== ФУТЕР ===== */
+        .footer {
+            background: #111;
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            margin-top: 30px;
+            border-top: 1px solid #333;
+            font-size: 0.9rem;
+        }
+
+        .footer .highlight {
+            color: #ffcc00;
+        }
+
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 640px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            header h1 .burger-icon {
+                font-size: 1.8rem;
+            }
+            .header-score .score-box {
+                font-size: 1.5rem;
+                padding: 6px 18px;
+            }
+            .burger-wrapper img {
+                width: 120px;
+            }
+            .burger-score-overlay {
+                font-size: 1.2rem;
+                padding: 2px 16px;
+                top: -16px;
+            }
+            .hero {
+                padding: 20px;
+            }
+            .gallery {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            .card img {
+                height: 140px;
+            }
+            .settings-row {
+                flex-direction: column;
+            }
+            .settings-row label {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== ХЕДЕР ===== -->
+    <header>
+        <h1>
+            <span class="burger-icon">🍔</span>
+            Ирина Владимировна
+            <span class="burger-icon">🍔</span>
+        </h1>
+        <div class="subtitle">Повелительница Бургеров · Обитает в кабинете 25 · Мировой рекордсмен</div>
+        <div class="header-score">
+            <span class="score-label">💰 бургеров накликано:</span>
+            <span class="score-box" id="scoreDisplay">0</span>
+        </div>
+    </header>
+
+    <!-- ===== ОСНОВНОЙ КОНТЕЙНЕР ===== -->
+    <div class="container">
+
+        <!-- ГЕРОЙ -->
+        <div class="hero">
+            <div class="hero-text">
+                <h2>🍔 Кто она такая? 🍔</h2>
+                <p>
+                    Ирина Владимировна любит есть бургеры. <strong>Она побила мировой рекорд</strong> — 305 бургеров за одну минуту!
+                    Она их не просто ест, она создала бургеры. Она — их мать и божество.
+                </p>
+                <p>
+                    Ирина обитает в <span class="warning">кабинете №25</span>. Не стучитесь, если у вас нет бургера — она съедает доставщиков прямо на пороге.
+                    Она самая повелительная и самая богатая женщина в мире, и всё её состояние сделано из бургеров.
+                </p>
+                <p>
+                    <em>«Я не ем бургеры, я поглощаю реальность»</em> — однажды сказала Ирина, глядя в глаза курьеру Яндекса.
+                </p>
+            </div>
+            <div class="hero-img">
+                <img src="main_photo.jpg" alt="Ирина Владимировна" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 400%22%3E%3Crect fill=%22%23222%22 width=%22400%22 height=%22400%22/%3E%3Ctext x=%2250%22 y=%22200%22 font-size=%2232%22 fill=%22%23ffcc00%22%3E👸 Ирина%3C/text%3E%3Ctext x=%2250%22 y=%22250%22 font-size=%2224%22 fill=%22%23aaa%22%3EПовелительница%3C/text%3E%3C/svg%3E'">
+            </div>
+        </div>
+
+        <!-- ===== БУРГЕР-КЛИКЕР ===== -->
+        <div class="clicker-section">
+            <h3>🍔 НАЖМИ НА БУРГЕР</h3>
+            <div class="clicker-sub">Каждый клик — +1 бургер в копилку Ирины</div>
+            <div class="burger-wrapper" id="burgerClicker">
+                <div class="burger-score-overlay" id="burgerOverlay">+0</div>
+                <img src="burger.png" alt="Бургер" id="burgerImg"
+                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23d49c6c%22/%3E%3Ctext x=%2225%22 y=%2265%22 font-size=%2232%22 fill=%22%233d2b1a%22%3E🍔%3C/text%3E%3C/svg%3E'">
+            </div>
+        </div>
+
+        <!-- ===== АВТОРИЗАЦИЯ / НАСТРОЙКИ ===== -->
+        <div class="auth-section" id="authSection">
+            <!-- Блок входа/регистрации -->
+            <div id="authBlock">
+                <div class="auth-title">🔐 Вход / Регистрация</div>
+                <div class="auth-form">
+                    <input type="text" id="regUsername" placeholder="Имя пользователя" value="burger_fan">
+                    <input type="password" id="regPassword" placeholder="Пароль" value="123456">
+                </div>
+                <div class="auth-buttons">
+                    <button class="btn btn-reg" id="registerBtn">📝 Регистрация</button>
+                    <button class="btn btn-login" id="loginBtn">🔑 Войти</button>
+                </div>
+                <div id="authStatus" class="status">⚪ Не авторизован</div>
+            </div>
+
+            <!-- Блок настроек аккаунта (скрыт по умолчанию) -->
+            <div class="account-settings" id="accountSettings">
+                <div class="auth-title" style="margin-bottom:8px;">⚙️ Настройки аккаунта</div>
+                <div class="settings-row">
+                    <label>👤 Имя</label>
+                    <input type="text" id="settingsUsername" placeholder="Новое имя">
+                </div>
+                <div class="settings-row">
+                    <label>📝 Описание</label>
+                    <textarea id="settingsDescription" placeholder="Расскажите о себе..." rows="2"></textarea>
+                </div>
+                <div class="settings-row" style="justify-content:center; gap:12px;">
+                    <button class="btn" id="updateSettingsBtn">💾 Обновить профиль</button>
+                    <button class="btn btn-danger" id="logoutBtn">🚪 Выйти</button>
+                </div>
+                <div id="settingsStatus" class="status" style="margin-top:12px;">⚙️ Настройки профиля</div>
+            </div>
+        </div>
+
+        <!-- ===== ЛИДЕРБОРД (ТОП-10) ===== -->
+        <div class="leaderboard-wrap">
+            <h3>
+                <span class="trophy">🏆</span> ЛИДЕРБОРД · ТОП-10
+                <span class="trophy">🏆</span>
+            </h3>
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>#</th><th>Имя</th><th>Описание</th><th>🍔 Бургеры</th></tr></thead>
+                    <tbody id="leaderboardBody">
+                        <tr><td colspan="4" class="empty-message">Загрузка...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ===== ГАЛЕРЕЯ ===== -->
+        <h2 class="gallery-title">🏆 Галерея Империи Бургеров</h2>
+        <div class="gallery">
+            <div class="card">
+                <img src="broccoli.jpg" alt="Брокколи" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🥦'">
+                <h3>Несъедобная гора</h3>
+                <p>Она хотела съесть это за 10 секунд, но поняла, что это не бургер.</p>
+            </div>
+            <div class="card">
+                <img src="delivery.jpg" alt="Доставка" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🚚'">
+                <h3>Последний ужин доставщика</h3>
+                <p>Курьер приехал. Он не знает, что вместо чаевых его съедят.</p>
+            </div>
+            <div class="card">
+                <img src="giant_burger.jpg" alt="Гигантский бургер" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🍔'">
+                <h3>Обычный перекус</h3>
+                <p>Это её завтрак. Она попросила добавки, но официант сбежал.</p>
+            </div>
+            <div class="card">
+                <img src="portrait.jpg" alt="Портрет" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=👸'">
+                <h3>Фото на пропуск в Макдоналдс</h3>
+                <p>У неё пожизненный абонемент на бесплатную еду.</p>
+            </div>
+            <div class="card">
+                <img src="school.jpg" alt="Школа" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🏫'">
+                <h3>Похищение детей</h3>
+                <p>«Идите за мной, там в столовой бургеры». Они не смогли отказать.</p>
+            </div>
+            <div class="card">
+                <img src="chart.jpg" alt="График" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=📈'">
+                <h3>График поедания реальности</h3>
+                <p>График ушел в бесконечность. БургерКоин обвалил биткоин.</p>
+            </div>
+            <div class="card">
+                <img src="towel.jpg" alt="Полотенце" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🧖'">
+                <h3>Спа с мыслями о еде</h3>
+                <p>Она парится, чтобы бургеры в животе лучше переваривались.</p>
+            </div>
+            <div class="card">
+                <img src="sponsors.jpg" alt="Спонсоры" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=💰'">
+                <h3>Инвесторы в страхе</h3>
+                <p>Илон Маск понял, что его Tesla — просто хлеб.</p>
+            </div>
+            <div class="card">
+                <img src="pirate.jpg" alt="Пират" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🏴‍☠️'">
+                <h3>Капитан Бургер</h3>
+                <p>Она ограбила пиратский корабль и забрала весь кетчуп.</p>
+            </div>
+            <div class="card">
+                <img src="plush.jpg" alt="Плюш" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🧸'">
+                <h3>Её прислужник</h3>
+                <p>Мягкая версия Ирины. Если не накормить — плачет.</p>
+            </div>
+            <div class="card">
+                <img src="splash.jpg" alt="Прыжок" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🌊'">
+                <h3>Атлантида</h3>
+                <p>Когда она прыгнула, волна смыла весь пляж.</p>
+            </div>
+            <div class="card">
+                <img src="angel.jpg" alt="Ангел" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=😇'">
+                <h3>Святой Джанк-фуд</h3>
+                <p>Бог послал её спасти мир от голода. Но она съела и Бога.</p>
+            </div>
+            <div class="card">
+                <img src="indian.jpg" alt="Индеец" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🪶'">
+                <h3>Тотемное животное</h3>
+                <p>Она приручила бургер. Теперь он её верный пёс.</p>
+            </div>
+            <div class="card">
+                <img src="gold.jpg" alt="Золото" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=✨'">
+                <h3>Позолоченный перекус</h3>
+                <p>Золотой бургер, золотые зубы. Она даже золото превращает в еду.</p>
+            </div>
+            <div class="card">
+                <img src="number.jpg" alt="Номер" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🔢'">
+                <h3>Участник №457</h3>
+                <p>Она победила, но все остальные участники пропали.</p>
+            </div>
+            <div class="card">
+                <img src="pot.jpg" alt="Кастрюля" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🍲'">
+                <h3>Прямой эфир</h3>
+                <p>Она готовит суп из своих врагов. 10 млн зрителей в шоке.</p>
+            </div>
+            <div class="card">
+                <img src="maid.jpg" alt="Горничная" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🧹'">
+                <h3>Уборка после себя</h3>
+                <p>Когда она съедает мир, ей приходится его вытирать.</p>
+            </div>
+            <div class="card">
+                <img src="mask.jpg" alt="Маска" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🎭'">
+                <h3>Призрак Бургера</h3>
+                <p>Она скрывается под маской, чтобы воровать чизбургеры.</p>
+            </div>
+            <div class="card">
+                <img src="queen.jpg" alt="Королева" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=👑'">
+                <h3>Владычица бургеров</h3>
+                <p>Престолонаследие через двойной чизбургер.</p>
+            </div>
+            <div class="card">
+                <img src="cinema.jpg" alt="Кино" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🎬'">
+                <h3>Шедевр искусства</h3>
+                <p>Кино про поход в Макдоналдс в 3 часа ночи.</p>
+            </div>
+            <div class="card">
+                <img src="anime.jpg" alt="Аниме" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🎌'">
+                <h3>Жирная-тян</h3>
+                <p>Главный антагонист аниме про еду. Кавайная, но смертоносная.</p>
+            </div>
+            <div class="card">
+                <img src="pies.jpg" alt="Пирожки" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🥧'">
+                <h3>ПИРОЖКИ</h3>
+                <p>Надпись просто гласит «ПИРОЖКИ». Не подходите, она всё съест.</p>
+            </div>
+            <div class="card">
+                <img src="conveyor.jpg" alt="Конвейер" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=⚙️'">
+                <h3>ПРИЯТНОГО АППЕТИТА!</h3>
+                <p>Повара в ужасе. Они знают, что они в меню.</p>
+            </div>
+            <div class="card">
+                <img src="beach.jpg" alt="Пляж" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🏖️'">
+                <h3>Сливки общества</h3>
+                <p>Она захватила пляж. Теперь это её личный бургерный курорт.</p>
+            </div>
+            <div class="card">
+                <img src="camera.jpg" alt="Камера" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=📸'">
+                <h3>Улыбнись, ты в меню</h3>
+                <p>Фотограф посмотрел на неё, как на булочку.</p>
+            </div>
+            <div class="card">
+                <img src="fortune.jpg" alt="Гадалка" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🔮'">
+                <h3>Карты Таро</h3>
+                <p>Карты предсказали, что она съест таролога. Она съела.</p>
+            </div>
+            <div class="card">
+                <img src="bald.jpg" alt="Лысая" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🧑‍🦲'">
+                <h3>Полный ноль жира</h3>
+                <p>Она сбрила волосы, чтобы было больше места для бургеров.</p>
+            </div>
+            <div class="card">
+                <img src="burrito.jpg" alt="Буррито" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🌯'">
+                <h3>Обед</h3>
+                <p>Она съела это за полсекунды. Даже не заметила.</p>
+            </div>
+            <div class="card">
+                <img src="sandwich.jpg" alt="Сэндвич" onerror="this.src='https://via.placeholder.com/300x200/333/ffcc00?text=🥪'">
+                <h3>Закуска</h3>
+                <p>Сэндвич для карликов. Она даже не почувствовала вкуса.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ФУТЕР ===== -->
+    <footer class="footer">
+        <p>&copy; 2026 Корпорация Ирины Владимировны. Все бургеры защищены.</p>
+        <p>Если у вас нет бургера — вы уже в <span class="highlight">кабинете №25</span>.</p>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        (function() {
+            // ===== SUPABASE =====
+            const SUPABASE_URL = 'https://anleogkfsqplkxuictso.supabase.co';
+            const SUPABASE_ANON_KEY =
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFubGVvZ2tmc3FwbGt4dWljdHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTA5MzUsImV4cCI6MjEwMTU4NjkzNX0.Cj5l6ZqFUekukLEof6OtH4QyGcwby2fo6qDL03as85w';
+
+            let supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase подключен');
+
+            // ===== СОСТОЯНИЕ =====
+            let currentUser = null; // { id, name, description, score }
+            let currentScore = 0;
+            const STORAGE_KEY = 'burger_irina_session';
+
+            // ===== DOM =====
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const authStatus = document.getElementById('authStatus');
+            const settingsStatus = document.getElementById('settingsStatus');
+            const leaderboardBody = document.getElementById('leaderboardBody');
+            const burger = document.getElementById('burgerClicker');
+            const burgerOverlay = document.getElementById('burgerOverlay');
+
+            const authBlock = document.getElementById('authBlock');
+            const accountSettings = document.getElementById('accountSettings');
+
+            const settingsUsername = document.getElementById('settingsUsername');
+            const settingsDescription = document.getElementById('settingsDescription');
+
+            // ===== UI =====
+            function updateScoreUI() {
+                scoreDisplay.textContent = currentScore;
+            }
+
+            function setAuthStatus(text, isOk = true) {
+                authStatus.textContent = text;
+                authStatus.style.borderLeftColor = isOk ? '#ffcc00' : '#ff4444';
+            }
+
+            function setSettingsStatus(text, isOk = true) {
+                settingsStatus.textContent = text;
+                settingsStatus.style.borderLeftColor = isOk ? '#ffcc00' : '#ff4444';
+            }
+
+            function showAuthBlock(show) {
+                authBlock.style.display = show ? 'block' : 'none';
+                accountSettings.classList.toggle('active', !show);
+            }
+
+            // ===== ЛИДЕРБОРД (ТОП-10) =====
+            async function refreshLeaderboard() {
+                try {
+                    const { data, error } = await supabase
+                        .from('user_scores')
+                        .select('id, name, description, score')
+                        .order('score', { ascending: false })
+                        .limit(10);
+                    if (error) { console.error(error);
+                        renderLeaderboard([]); return; }
+                    renderLeaderboard(data || []);
+                } catch (e) { console.error(e);
+                    renderLeaderboard([]); }
+            }
+
+            function renderLeaderboard(rows) {
+                if (!rows || rows.length === 0) {
+                    leaderboardBody.innerHTML =
+                    `<tr><td colspan="4" class="empty-message">📭 Нет записей</td></tr>`;
+                    return;
+                }
+                let html = '';
+                const medals = ['🥇', '🥈', '🥉'];
+                rows.forEach((row, index) => {
+                    const rank = index + 1;
+                    const medal = rank <= 3 ? medals[index] : `#${rank}`;
+                    const rowClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+                    const desc = row.description || '—';
+                    html += `<tr class="${rowClass}">
+                        <td><span class="medal">${medal}</span></td>
+                        <td><strong>${row.name || '—'}</strong></td>
+                        <td class="user-description">${desc}</td>
+                        <td>${row.score ?? 0}</td>
+                    </tr>`;
+                });
+                leaderboardBody.innerHTML = html;
+            }
+
+            // ===== РЕГИСТРАЦИЯ / ВХОД =====
+            async function registerUser(username, password) {
+                if (!username || !password) {
+                    setAuthStatus('❌ Заполните имя и пароль', false);
+                    return false;
+                }
+                try {
+                    const { data: existing, error: findErr } = await supabase
+                        .from('user_scores')
+                        .select('id')
+                        .eq('name', username)
+                        .maybeSingle();
+                    if (findErr) { console.error(findErr);
+                        setAuthStatus('❌ Ошибка проверки', false); return false; }
+                    if (existing) { setAuthStatus('❌ Имя уже занято', false); return false; }
+
+                    const { data: newUser, error: insertErr } = await supabase
+                        .from('user_scores')
+                        .insert([{
+                            name: username,
+                            password: password,
+                            score: 0,
+                            description: '🍔 Любитель бургеров'
+                        }])
+                        .select()
+                        .single();
+                    if (insertErr) { console.error(insertErr);
+                        setAuthStatus(`❌ ${insertErr.message}`, false); return false; }
+
+                    currentUser = { id: newUser.id, name: username, description: newUser.description || '', score: 0 };
+                    currentScore = 0;
+                    updateScoreUI();
+                    setAuthStatus(`✅ Привет, ${username}!`);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+                    showAuthBlock(false);
+                    loadSettings();
+                    refreshLeaderboard();
+                    return true;
+                } catch (e) { console.error(e);
+                    setAuthStatus('❌ Исключение', false); return false; }
+            }
+
+            async function loginUser(username, password) {
+                if (!username || !password) {
+                    setAuthStatus('❌ Введите имя и пароль', false);
+                    return false;
+                }
+                try {
+                    const { data: users, error } = await supabase
+                        .from('user_scores')
+                        .select('id, name, password, score, description')
+                        .eq('name', username)
+                        .eq('password', password);
+                    if (error) { console.error(error);
+                        setAuthStatus('❌ Ошибка запроса', false); return false; }
+                    if (!users || users.length === 0) {
+                        setAuthStatus('❌ Неверное имя или пароль', false);
+                        return false;
+                    }
+                    const user = users[0];
+                    currentUser = {
+                        id: user.id,
+                        name: user.name,
+                        description: user.description || '',
+                        score: user.score || 0
+                    };
+                    currentScore = currentUser.score || 0;
+                    updateScoreUI();
+                    setAuthStatus(`✅ Добро пожаловать, ${user.name}!`);
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+                    showAuthBlock(false);
+                    loadSettings();
+                    refreshLeaderboard();
+                    return true;
+                } catch (e) { console.error(e);
+                    setAuthStatus('❌ Исключение', false); return false; }
+            }
+
+            function logoutUser() {
+                currentUser = null;
+                currentScore = 0;
+                updateScoreUI();
+                setAuthStatus('⚪ Вы вышли');
+                localStorage.removeItem(STORAGE_KEY);
+                showAuthBlock(true);
+                refreshLeaderboard();
+            }
+
+            // ===== НАСТРОЙКИ =====
+            function loadSettings() {
+                if (currentUser) {
+                    settingsUsername.value = currentUser.name || '';
+                    settingsDescription.value = currentUser.description || '';
+                    setSettingsStatus('⚙️ Настройки загружены');
+                }
+            }
+
+            async function updateSettings() {
+                if (!currentUser) {
+                    setSettingsStatus('❌ Не авторизован', false);
+                    return;
+                }
+                const newName = settingsUsername.value.trim();
+                const newDesc = settingsDescription.value.trim();
+                if (!newName) {
+                    setSettingsStatus('❌ Имя не может быть пустым', false);
+                    return;
+                }
+
+                // Проверка, не занято ли имя другим пользователем
+                if (newName !== currentUser.name) {
+                    const { data: existing, error } = await supabase
+                        .from('user_scores')
+                        .select('id')
+                        .eq('name', newName)
+                        .neq('id', currentUser.id)
+                        .maybeSingle();
+                    if (error) { console.error(error);
+                        setSettingsStatus('❌ Ошибка проверки', false); return false; }
+                    if (existing) {
+                        setSettingsStatus('❌ Имя уже занято', false);
+                        return false;
+                    }
+                }
+
+                try {
+                    const { error } = await supabase
+                        .from('user_scores')
+                        .update({
+                            name: newName,
+                            description: newDesc
+                        })
+                        .eq('id', currentUser.id);
+                    if (error) {
+                        console.error(error);
+                        setSettingsStatus(`❌ ${error.message}`, false);
+                        return false;
+                    }
+                    currentUser.name = newName;
+                    currentUser.description = newDesc;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+                    setSettingsStatus('✅ Профиль обновлён!');
+                    refreshLeaderboard();
+                    return true;
+                } catch (e) { console.error(e);
+                    setSettingsStatus('❌ Исключение', false); return false; }
+            }
+
+            // ===== АВТОСОХРАНЕНИЕ =====
+            async function autoSave() {
+                if (!currentUser) return;
+                try {
+                    const { error } = await supabase
+                        .from('user_scores')
+                        .update({ score: currentScore })
+                        .eq('id', currentUser.id);
+                    if (error) console.error('AutoSave error:', error);
+                    else {
+                        currentUser.score = currentScore;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+                    }
+                } catch (e) { console.error(e); }
+            }
+
+            // ===== ОБРАБОТЧИКИ =====
+            // Клик по бургеру
+            let clickCount = 0;
+            burger.addEventListener('click', () => {
+                currentScore += 1;
+                updateScoreUI();
+                // Анимация оверлея
+                clickCount++;
+                burgerOverlay.textContent = `+${clickCount}`;
+                burgerOverlay.style.transform = 'translateX(-50%) scale(1.2)';
+                setTimeout(() => {
+                    burgerOverlay.style.transform = 'translateX(-50%) scale(1)';
+                }, 150);
+                // Автосохранение после клика (раз в 5 кликов для оптимизации)
+                if (clickCount % 5 === 0) {
+                    autoSave();
+                }
+            });
+
+            // Регистрация
+            document.getElementById('registerBtn').addEventListener('click', async () => {
+                const name = document.getElementById('regUsername').value.trim();
+                const pass = document.getElementById('regPassword').value.trim();
+                await registerUser(name, pass);
+            });
+
+            // Вход
+            document.getElementById('loginBtn').addEventListener('click', async () => {
+                const name = document.getElementById('regUsername').value.trim();
+                const pass = document.getElementById('regPassword').value.trim();
+                await loginUser(name, pass);
+            });
+
+            // Выход
+            document.getElementById('logoutBtn').addEventListener('click', logoutUser);
+
+            // Обновить настройки
+            document.getElementById('updateSettingsBtn').addEventListener('click', updateSettings);
+
+            // ===== ВОССТАНОВЛЕНИЕ СЕССИИ =====
+            async function restoreSession() {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    try {
+                        const user = JSON.parse(saved);
+                        const { data, error } = await supabase
+                            .from('user_scores')
+                            .select('id, name, description, score')
+                            .eq('id', user.id)
+                            .maybeSingle();
+                        if (error || !data) {
+                            localStorage.removeItem(STORAGE_KEY);
+                            showAuthBlock(true);
+                            refreshLeaderboard();
+                            return;
+                        }
+                        currentUser = {
+                            id: data.id,
+                            name: data.name,
+                            description: data.description || '',
+                            score: data.score || 0
+                        };
+                        currentScore = currentUser.score || 0;
+                        updateScoreUI();
+                        setAuthStatus(`🔁 Сессия: ${currentUser.name}`);
+                        showAuthBlock(false);
+                        loadSettings();
+                        refreshLeaderboard();
+                    } catch (e) {
+                        console.warn('Ошибка восстановления сессии');
+                        localStorage.removeItem(STORAGE_KEY);
+                        showAuthBlock(true);
+                        refreshLeaderboard();
+                    }
+                } else {
+                    showAuthBlock(true);
+                    refreshLeaderboard();
+                }
+            }
+
+            // ===== ИНИЦИАЛИЗАЦИЯ =====
+            restoreSession();
+
+            // Автосохранение каждые 10 секунд
+            setInterval(autoSave, 10000);
+
+            // Обновление лидерборда каждые 15 секунд
+            setInterval(refreshLeaderboard, 15000);
+
+            // При загрузке страницы подгружаем актуальные данные
+            window.addEventListener('load', () => {
+                if (currentUser) {
+                    loadSettings();
+                }
+                refreshLeaderboard();
+            });
+
+        })();
+    </script>
+
+</body>
+</html>
