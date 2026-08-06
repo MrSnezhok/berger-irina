@@ -4,11 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🍔 Ирина Владимировна | Повелительница Бургеров</title>
-    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js">
     </script>
     <style>
-        /* ===== ГЛОБАЛЬНЫЙ СТИЛЬ ===== */
         * {
             margin: 0;
             padding: 0;
@@ -22,13 +20,11 @@
             min-height: 100vh;
         }
 
-        /* ===== ХЕДЕР ===== */
         header {
             background: linear-gradient(135deg, #333333, #000000);
             padding: 30px 20px 24px;
             text-align: center;
             border-bottom: 3px solid #ffcc00;
-            position: relative;
         }
 
         header h1 {
@@ -59,7 +55,6 @@
             padding-top: 10px;
         }
 
-        /* ===== СЧЁТ В ХЕДЕРЕ ===== */
         .header-score {
             margin-top: 16px;
             display: flex;
@@ -86,14 +81,12 @@
             font-size: 1.1rem;
         }
 
-        /* ===== КОНТЕЙНЕР ===== */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* ===== ГЕРОЙ ===== */
         .hero {
             display: flex;
             flex-wrap: wrap;
@@ -145,7 +138,6 @@
             object-fit: cover;
         }
 
-        /* ===== БУРГЕР-КЛИКЕР ===== */
         .clicker-section {
             text-align: center;
             margin: 30px 0 40px;
@@ -153,7 +145,6 @@
             border-radius: 30px;
             padding: 30px 20px;
             border: 1px solid #333;
-            position: relative;
         }
 
         .clicker-section h3 {
@@ -194,7 +185,6 @@
             pointer-events: none;
         }
 
-        /* ===== СЧЁТ НАД БУРГЕРОМ (всего бургеров) ===== */
         .burger-score-overlay {
             position: absolute;
             top: -20px;
@@ -212,14 +202,12 @@
             pointer-events: none;
         }
 
-        /* ===== АВТОРИЗАЦИЯ / НАСТРОЙКИ ===== */
         .auth-section {
             background: #1f1f1f;
             border-radius: 30px;
             padding: 24px 20px;
             margin: 30px 0;
             border: 1px solid #333;
-            transition: all 0.3s;
         }
 
         .auth-section .auth-title {
@@ -320,7 +308,6 @@
             font-size: 0.95rem;
         }
 
-        /* ===== НАСТРОЙКИ АККАУНТА ===== */
         .account-settings {
             display: none;
             flex-direction: column;
@@ -400,7 +387,28 @@
             background: #c85f55;
         }
 
-        /* ===== ЛИДЕРБОРД (ТОП-10) ===== */
+        .total-score {
+            background: #1a1a1a;
+            border-radius: 30px;
+            padding: 16px 20px;
+            margin: 20px 0 30px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .total-score .total-label {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        .total-score .total-value {
+            color: #ffcc00;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-left: 12px;
+        }
+
+        /* ===== ЛИДЕРБОРД ===== */
         .leaderboard-wrap {
             background: #1a1a1a;
             border-radius: 30px;
@@ -422,12 +430,8 @@
             gap: 12px;
         }
 
-        .leaderboard-wrap h3 .trophy {
-            font-size: 1.8rem;
-        }
-
         .table-scroll {
-            max-height: 300px;
+            max-height: 400px;
             overflow-y: auto;
             border-radius: 24px;
             background: #111;
@@ -467,7 +471,7 @@
         }
 
         td {
-            padding: 12px 14px;
+            padding: 10px 14px;
             border-bottom: 1px solid #2a2a2a;
             color: #ccc;
             vertical-align: middle;
@@ -502,39 +506,302 @@
             margin-right: 6px;
         }
 
-        .user-description {
-            color: #999;
-            font-size: 0.85rem;
-            font-style: italic;
-            max-width: 200px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        .user-avatar-small {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #444;
+            cursor: pointer;
+            transition: 0.2s;
         }
 
-        /* ===== ОБЩИЙ СЧЁТ ВСЕХ ИГРОКОВ ===== */
-        .total-score {
+        .user-avatar-small:hover {
+            border-color: #ffcc00;
+            transform: scale(1.1);
+        }
+
+        .privilege-icon {
+            width: 20px;
+            height: 20px;
+            margin: 0 2px;
+            vertical-align: middle;
+            filter: drop-shadow(0 0 4px rgba(255, 204, 0, 0.3));
+        }
+
+        .user-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .privileges-cell {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== ПРОФИЛЬ ===== */
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .profile-modal.active {
+            display: flex;
+        }
+
+        .profile-card {
+            background: #222;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            border: 2px solid #ffcc00;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .profile-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            color: #aaa;
+            cursor: pointer;
+            transition: 0.2s;
+            background: none;
+            border: none;
+        }
+
+        .profile-close:hover {
+            color: #ffcc00;
+            transform: rotate(90deg);
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #ffcc00;
+            margin: 0 auto 20px;
+            display: block;
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+        }
+
+        .profile-name {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #ffcc00;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .profile-privileges {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .profile-privilege {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #1a1a1a;
+            padding: 6px 14px;
+            border-radius: 60px;
+            border: 1px solid #444;
+            font-size: 0.85rem;
+        }
+
+        .profile-privilege img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .profile-description {
+            text-align: center;
+            color: #ccc;
+            font-size: 1.1rem;
+            margin: 16px 0;
+            padding: 16px;
+            background: #1a1a1a;
+            border-radius: 16px;
+            border: 1px solid #333;
+        }
+
+        .profile-score {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #aaa;
+        }
+
+        .profile-score span {
+            color: #ffcc00;
+            font-weight: 700;
+            font-size: 1.6rem;
+        }
+
+        /* ===== ЧАТ ===== */
+        .chat-section {
             background: #1a1a1a;
             border-radius: 30px;
-            padding: 16px 20px;
-            margin: 20px 0 30px;
+            padding: 20px;
             border: 1px solid #333;
-            text-align: center;
+            margin: 30px 0;
         }
 
-        .total-score .total-label {
-            color: #aaa;
-            font-size: 1.1rem;
-        }
-
-        .total-score .total-value {
+        .chat-section h3 {
             color: #ffcc00;
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-left: 12px;
+            text-align: center;
+            font-size: 1.4rem;
+            margin-bottom: 16px;
         }
 
-        /* ===== ГАЛЕРЕЯ ===== */
+        .chat-messages {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #111;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 16px;
+            scrollbar-width: thin;
+            scrollbar-color: #ffcc00 #2a2a2a;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: #1a1a1a;
+            border-radius: 12px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #ffcc00;
+            border-radius: 12px;
+        }
+
+        .chat-message {
+            display: flex;
+            gap: 12px;
+            padding: 10px;
+            border-bottom: 1px solid #2a2a2a;
+            align-items: flex-start;
+        }
+
+        .chat-message:last-child {
+            border-bottom: none;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #444;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .chat-avatar:hover {
+            border-color: #ffcc00;
+        }
+
+        .chat-content {
+            flex: 1;
+        }
+
+        .chat-username {
+            font-weight: 600;
+            color: #ffcc00;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .chat-username .privilege-icon-sm {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+        }
+
+        .chat-text {
+            color: #ddd;
+            margin-top: 4px;
+            word-wrap: break-word;
+        }
+
+        .chat-time {
+            color: #666;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 60px;
+            border: 1px solid #444;
+            background: #121212;
+            color: #f0f0f0;
+            font-size: 0.95rem;
+            min-width: 150px;
+        }
+
+        .chat-input-area input:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 0 3px #ffcc0030;
+        }
+
+        .chat-input-area button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            background: #ffcc00;
+            color: #000;
+            cursor: pointer;
+            transition: 0.1s;
+            font-size: 0.95rem;
+        }
+
+        .chat-input-area button:active {
+            transform: scale(0.94);
+        }
+
+        .chat-input-area button:hover {
+            background: #e6b800;
+        }
+
         .gallery-title {
             text-align: center;
             font-size: 2.5rem;
@@ -592,7 +859,6 @@
             padding: 0 12px;
         }
 
-        /* ===== ФУТЕР ===== */
         .footer {
             background: #111;
             text-align: center;
@@ -607,7 +873,6 @@
             color: #ffcc00;
         }
 
-        /* ===== АДАПТИВ ===== */
         @media (max-width: 640px) {
             header h1 {
                 font-size: 2rem;
@@ -645,12 +910,21 @@
             .total-score .total-value {
                 font-size: 1.6rem;
             }
+            .profile-card {
+                padding: 20px;
+            }
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+            }
+            .profile-name {
+                font-size: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== ХЕДЕР ===== -->
     <header>
         <h1>
             <span class="burger-icon">🍔</span>
@@ -664,10 +938,8 @@
         </div>
     </header>
 
-    <!-- ===== ОСНОВНОЙ КОНТЕЙНЕР ===== -->
     <div class="container">
 
-        <!-- ГЕРОЙ -->
         <div class="hero">
             <div class="hero-text">
                 <h2>🍔 Кто она такая? 🍔</h2>
@@ -688,26 +960,21 @@
             </div>
         </div>
 
-        <!-- ===== БУРГЕР-КЛИКЕР ===== -->
         <div class="clicker-section">
             <h3>🍔 НАЖМИ НА БУРГЕР</h3>
             <div class="clicker-sub">Каждый клик — +1 бургер в копилку Ирины</div>
             <div class="burger-wrapper" id="burgerClicker">
                 <div class="burger-score-overlay" id="burgerOverlay">0</div>
-                <img src="burger.png" alt="Бургер" id="burgerImg"
-                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23d49c6c%22/%3E%3Ctext x=%2225%22 y=%2265%22 font-size=%2232%22 fill=%22%233d2b1a%22%3E🍔%3C/text%3E%3C/svg%3E'">
+                <img src="burger.png" alt="Бургер" id="burgerImg" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23d49c6c%22/%3E%3Ctext x=%2225%22 y=%2265%22 font-size=%2232%22 fill=%22%233d2b1a%22%3E🍔%3C/text%3E%3C/svg%3E'">
             </div>
         </div>
 
-        <!-- ===== ОБЩИЙ СЧЁТ ВСЕХ ИГРОКОВ ===== -->
         <div class="total-score">
             <span class="total-label">🌍 Всего бургеров натапано в мире:</span>
             <span class="total-value" id="totalScoreDisplay">0</span>
         </div>
 
-        <!-- ===== АВТОРИЗАЦИЯ / НАСТРОЙКИ ===== -->
         <div class="auth-section" id="authSection">
-            <!-- Блок входа/регистрации -->
             <div id="authBlock">
                 <div class="auth-title">🔐 Вход / Регистрация</div>
                 <div class="auth-form">
@@ -721,7 +988,6 @@
                 <div id="authStatus" class="status">⚪ Не авторизован</div>
             </div>
 
-            <!-- Блок настроек аккаунта (скрыт по умолчанию) -->
             <div class="account-settings" id="accountSettings">
                 <div class="auth-title" style="margin-bottom:8px;">⚙️ Настройки аккаунта</div>
                 <div class="settings-row">
@@ -732,6 +998,10 @@
                     <label>📝 Описание</label>
                     <textarea id="settingsDescription" placeholder="Расскажите о себе..." rows="2"></textarea>
                 </div>
+                <div class="settings-row">
+                    <label>🖼️ Фото (URL)</label>
+                    <input type="text" id="settingsAvatar" placeholder="https://example.com/avatar.jpg">
+                </div>
                 <div class="settings-row" style="justify-content:center; gap:12px;">
                     <button class="btn" id="updateSettingsBtn">💾 Обновить профиль</button>
                     <button class="btn btn-danger" id="logoutBtn">🚪 Выйти</button>
@@ -740,7 +1010,7 @@
             </div>
         </div>
 
-        <!-- ===== ЛИДЕРБОРД (ТОП-10) ===== -->
+        <!-- ===== ЛИДЕРБОРД ===== -->
         <div class="leaderboard-wrap">
             <h3>
                 <span class="trophy">🏆</span> ЛИДЕРБОРД · ТОП-10
@@ -748,7 +1018,7 @@
             </h3>
             <div class="table-scroll">
                 <table>
-                    <thead><tr><th>#</th><th>Имя</th><th>Описание</th><th>🍔 Бургеры</th></tr></thead>
+                    <thead><tr><th>#</th><th>Игрок</th><th>Привилегии</th><th>🍔</th></tr></thead>
                     <tbody id="leaderboardBody">
                         <tr><td colspan="4" class="empty-message">Загрузка...</td></tr>
                     </tbody>
@@ -756,7 +1026,30 @@
             </div>
         </div>
 
-        <!-- ===== ГАЛЕРЕЯ ===== -->
+        <!-- ===== ЧАТ ===== -->
+        <div class="chat-section">
+            <h3>💬 Чат бургер-империи</h3>
+            <div class="chat-messages" id="chatMessages">
+                <div class="empty-message">Загрузка сообщений...</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Напишите сообщение..." maxlength="500">
+                <button id="sendMessageBtn">📤 Отправить</button>
+            </div>
+        </div>
+
+        <!-- ===== ПРОФИЛЬ (МОДАЛКА) ===== -->
+        <div class="profile-modal" id="profileModal">
+            <div class="profile-card">
+                <button class="profile-close" id="profileCloseBtn">✕</button>
+                <img class="profile-avatar" id="profileAvatar" src="" alt="Аватар">
+                <div class="profile-name" id="profileName">Имя</div>
+                <div class="profile-privileges" id="profilePrivileges"></div>
+                <div class="profile-description" id="profileDescription">Описание</div>
+                <div class="profile-score">🍔 <span id="profileScore">0</span> бургеров</div>
+            </div>
+        </div>
+
         <h2 class="gallery-title">🏆 Галерея Империи Бургеров</h2>
         <div class="gallery">
             <div class="card">
@@ -907,17 +1200,13 @@
         </div>
     </div>
 
-    <!-- ===== ФУТЕР ===== -->
     <footer class="footer">
         <p>&copy; 2026 Корпорация Ирины Владимировны. Все бургеры защищены.</p>
         <p>Если у вас нет бургера — вы уже в <span class="highlight">кабинете №25</span>.</p>
     </footer>
 
-    <!-- ===================================================================== -->
-    <!-- ===== JAVASCRIPT ===== -->
     <script>
         (function() {
-            // ===== SUPABASE =====
             const SUPABASE_URL = 'https://anleogkfsqplkxuictso.supabase.co';
             const SUPABASE_ANON_KEY =
                 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFubGVvZ2tmc3FwbGt4dWljdHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTA5MzUsImV4cCI6MjEwMTU4NjkzNX0.Cj5l6ZqFUekukLEof6OtH4QyGcwby2fo6qDL03as85w';
@@ -925,13 +1214,11 @@
             let supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log('✅ Supabase подключен');
 
-            // ===== СОСТОЯНИЕ =====
             let currentUser = null;
             let currentScore = 0;
             const STORAGE_KEY = 'burger_irina_session';
-            let totalScore = 0;
 
-            // ===== DOM =====
+            // DOM
             const scoreDisplay = document.getElementById('scoreDisplay');
             const authStatus = document.getElementById('authStatus');
             const settingsStatus = document.getElementById('settingsStatus');
@@ -939,14 +1226,62 @@
             const burger = document.getElementById('burgerClicker');
             const burgerOverlay = document.getElementById('burgerOverlay');
             const totalScoreDisplay = document.getElementById('totalScoreDisplay');
-
             const authBlock = document.getElementById('authBlock');
             const accountSettings = document.getElementById('accountSettings');
-
             const settingsUsername = document.getElementById('settingsUsername');
             const settingsDescription = document.getElementById('settingsDescription');
+            const settingsAvatar = document.getElementById('settingsAvatar');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
 
-            // ===== UI =====
+            // Profile modal
+            const profileModal = document.getElementById('profileModal');
+            const profileCloseBtn = document.getElementById('profileCloseBtn');
+            const profileAvatar = document.getElementById('profileAvatar');
+            const profileName = document.getElementById('profileName');
+            const profilePrivileges = document.getElementById('profilePrivileges');
+            const profileDescription = document.getElementById('profileDescription');
+            const profileScore = document.getElementById('profileScore');
+
+            // Privilege icons mapping
+            const PRIVILEGE_ICONS = {
+                'burger': 'burger.png',
+                'verified': 'verified.png',
+                'vip': 'vip.png',
+                'creator': 'creator.png'
+            };
+
+            const PRIVILEGE_NAMES = {
+                'burger': '🍔 Бургер',
+                'verified': '✅ Верифицирован',
+                'vip': '👑 VIP',
+                'creator': '⭐ Создатель'
+            };
+
+            function getPrivilegeIcon(privilege) {
+                return PRIVILEGE_ICONS[privilege] || '';
+            }
+
+            function renderPrivileges(privileges) {
+                if (!privileges || privileges.length === 0) return '';
+                return privileges.map(p => {
+                    const icon = getPrivilegeIcon(p);
+                    return icon ? `<img src="${icon}" class="privilege-icon" title="${PRIVILEGE_NAMES[p] || p}" alt="${p}">` :
+                        `<span class="privilege-icon">${PRIVILEGE_NAMES[p] || p}</span>`;
+                }).join('');
+            }
+
+            function renderPrivilegesProfile(privileges) {
+                if (!privileges || privileges.length === 0) return '<span style="color:#666;">Нет привилегий</span>';
+                return privileges.map(p => {
+                    const icon = getPrivilegeIcon(p);
+                    return `<div class="profile-privilege">
+                        ${icon ? `<img src="${icon}" alt="${p}">` : ''}
+                        ${PRIVILEGE_NAMES[p] || p}
+                    </div>`;
+                }).join('');
+            }
+
             function updateScoreUI() {
                 scoreDisplay.textContent = currentScore;
                 burgerOverlay.textContent = currentScore;
@@ -967,12 +1302,12 @@
                 accountSettings.classList.toggle('active', !show);
             }
 
-            // ===== ЛИДЕРБОРД (ТОП-10) =====
+            // ===== ЛИДЕРБОРД =====
             async function refreshLeaderboard() {
                 try {
                     const { data, error } = await supabase
                         .from('user_scores')
-                        .select('id, name, description, score')
+                        .select('id, name, description, avatar, privileges, score')
                         .order('score', { ascending: false })
                         .limit(10);
                     if (error) { console.error(error);
@@ -994,11 +1329,24 @@
                     const rank = index + 1;
                     const medal = rank <= 3 ? medals[index] : `#${rank}`;
                     const rowClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
-                    const desc = row.description || '—';
+                    const avatar = row.avatar || '';
+                    const privileges = row.privileges || [];
+
                     html += `<tr class="${rowClass}">
                         <td><span class="medal">${medal}</span></td>
-                        <td><strong>${row.name || '—'}</strong></td>
-                        <td class="user-description">${desc}</td>
+                        <td>
+                            <div class="user-name-cell">
+                                <img src="${avatar}" class="user-avatar-small" 
+                                     onclick="window.showProfile(${row.id})"
+                                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23333%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2230%22 y=%2265%22 font-size=%2240%22 fill=%22%23aaa%22%3E👤%3C/text%3E%3C/svg%3E'">
+                                <strong onclick="window.showProfile(${row.id})" style="cursor:pointer;">${row.name || '—'}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="privileges-cell">
+                                ${renderPrivileges(privileges)}
+                            </div>
+                        </td>
                         <td>${row.score ?? 0}</td>
                     </tr>`;
                 });
@@ -1013,13 +1361,151 @@
                         .select('score');
                     if (error) { console.error(error); return; }
                     if (data) {
-                        totalScore = data.reduce((sum, row) => sum + (row.score || 0), 0);
-                        totalScoreDisplay.textContent = totalScore;
+                        const total = data.reduce((sum, row) => sum + (row.score || 0), 0);
+                        totalScoreDisplay.textContent = total;
                     }
                 } catch (e) { console.error(e); }
             }
 
-            // ===== РЕГИСТРАЦИЯ / ВХОД =====
+            // ===== ЧАТ =====
+            async function loadChat() {
+                try {
+                    const { data, error } = await supabase
+                        .from('messages')
+                        .select('id, username, avatar, privileges, message, created_at')
+                        .order('created_at', { ascending: false })
+                        .limit(50);
+                    if (error) { console.error(error);
+                        renderChat([]); return; }
+                    renderChat(data || []);
+                } catch (e) { console.error(e);
+                    renderChat([]); }
+            }
+
+            function renderChat(messages) {
+                if (!messages || messages.length === 0) {
+                    chatMessages.innerHTML = '<div class="empty-message">💬 Нет сообщений. Напишите первым!</div>';
+                    return;
+                }
+                let html = '';
+                messages.reverse().forEach(msg => {
+                    const avatar = msg.avatar || '';
+                    const privileges = msg.privileges || [];
+                    const time = new Date(msg.created_at).toLocaleString('ru-RU', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        day: '2-digit',
+                        month: '2-digit'
+                    });
+
+                    html += `<div class="chat-message">
+                        <img src="${avatar}" class="chat-avatar" 
+                             onclick="window.showProfileByName('${msg.username}')"
+                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23333%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2230%22 y=%2265%22 font-size=%2240%22 fill=%22%23aaa%22%3E👤%3C/text%3E%3C/svg%3E'">
+                        <div class="chat-content">
+                            <div class="chat-username">
+                                ${msg.username || 'Аноним'}
+                                ${privileges.map(p => {
+                                    const icon = PRIVILEGE_ICONS[p];
+                                    return icon ? `<img src="${icon}" class="privilege-icon-sm" title="${PRIVILEGE_NAMES[p] || p}">` : '';
+                                }).join('')}
+                                <span class="chat-time">${time}</span>
+                            </div>
+                            <div class="chat-text">${msg.message || ''}</div>
+                        </div>
+                    </div>`;
+                });
+                chatMessages.innerHTML = html;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            async function sendMessage() {
+                const text = chatInput.value.trim();
+                if (!text) return;
+                if (!currentUser) {
+                    alert('Сначала войдите в аккаунт!');
+                    return;
+                }
+
+                try {
+                    const { error } = await supabase
+                        .from('messages')
+                        .insert([{
+                            user_id: currentUser.id,
+                            username: currentUser.name,
+                            avatar: currentUser.avatar || '',
+                            privileges: currentUser.privileges || [],
+                            message: text
+                        }]);
+                    if (error) {
+                        console.error(error);
+                        alert('Ошибка отправки сообщения');
+                        return;
+                    }
+                    chatInput.value = '';
+                    loadChat();
+                } catch (e) { console.error(e); }
+            }
+
+            // ===== ПРОФИЛЬ (модалка) =====
+            async function showProfile(userId) {
+                try {
+                    const { data, error } = await supabase
+                        .from('user_scores')
+                        .select('id, name, description, avatar, privileges, score')
+                        .eq('id', userId)
+                        .maybeSingle();
+                    if (error || !data) {
+                        alert('Пользователь не найден');
+                        return;
+                    }
+                    openProfile(data);
+                } catch (e) { console.error(e); }
+            }
+
+            window.showProfile = showProfile;
+
+            async function showProfileByName(username) {
+                try {
+                    const { data, error } = await supabase
+                        .from('user_scores')
+                        .select('id, name, description, avatar, privileges, score')
+                        .eq('name', username)
+                        .maybeSingle();
+                    if (error || !data) {
+                        alert('Пользователь не найден');
+                        return;
+                    }
+                    openProfile(data);
+                } catch (e) { console.error(e); }
+            }
+
+            window.showProfileByName = showProfileByName;
+
+            function openProfile(user) {
+                profileAvatar.src = user.avatar || '';
+                profileAvatar.onerror = function() {
+                    this.src =
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23333' width='100' height='100'/%3E%3Ctext x='30' y='65' font-size='40' fill='%23aaa'%3E👤%3C/text%3E%3C/svg%3E";
+                };
+                profileName.textContent = user.name || 'Аноним';
+                profilePrivileges.innerHTML = renderPrivilegesProfile(user.privileges || []);
+                profileDescription.textContent = user.description || 'Нет описания';
+                profileScore.textContent = user.score || 0;
+                profileModal.classList.add('active');
+            }
+
+            profileCloseBtn.addEventListener('click', () => {
+                profileModal.classList.remove('active');
+            });
+
+            profileModal.addEventListener('click', (e) => {
+                if (e.target === profileModal) {
+                    profileModal.classList.remove('active');
+                }
+            });
+
+            // ===== АВТОРИЗАЦИЯ =====
             async function registerUser(username, password) {
                 if (!username || !password) {
                     setAuthStatus('❌ Заполните имя и пароль', false);
@@ -1041,14 +1527,23 @@
                             name: username,
                             password: password,
                             score: 0,
-                            description: '🍔 Любитель бургеров'
+                            description: '🍔 Любитель бургеров',
+                            avatar: '',
+                            privileges: []
                         }])
                         .select()
                         .single();
                     if (insertErr) { console.error(insertErr);
                         setAuthStatus(`❌ ${insertErr.message}`, false); return false; }
 
-                    currentUser = { id: newUser.id, name: username, description: newUser.description || '', score: 0 };
+                    currentUser = {
+                        id: newUser.id,
+                        name: username,
+                        description: newUser.description || '',
+                        avatar: newUser.avatar || '',
+                        privileges: newUser.privileges || [],
+                        score: 0
+                    };
                     currentScore = 0;
                     updateScoreUI();
                     setAuthStatus(`✅ Привет, ${username}!`);
@@ -1057,6 +1552,7 @@
                     loadSettings();
                     refreshLeaderboard();
                     refreshTotalScore();
+                    loadChat();
                     return true;
                 } catch (e) { console.error(e);
                     setAuthStatus('❌ Исключение', false); return false; }
@@ -1070,7 +1566,7 @@
                 try {
                     const { data: users, error } = await supabase
                         .from('user_scores')
-                        .select('id, name, password, score, description')
+                        .select('id, name, password, score, description, avatar, privileges')
                         .eq('name', username)
                         .eq('password', password);
                     if (error) { console.error(error);
@@ -1084,6 +1580,8 @@
                         id: user.id,
                         name: user.name,
                         description: user.description || '',
+                        avatar: user.avatar || '',
+                        privileges: user.privileges || [],
                         score: user.score || 0
                     };
                     currentScore = currentUser.score || 0;
@@ -1094,6 +1592,7 @@
                     loadSettings();
                     refreshLeaderboard();
                     refreshTotalScore();
+                    loadChat();
                     return true;
                 } catch (e) { console.error(e);
                     setAuthStatus('❌ Исключение', false); return false; }
@@ -1108,6 +1607,7 @@
                 showAuthBlock(true);
                 refreshLeaderboard();
                 refreshTotalScore();
+                loadChat();
             }
 
             // ===== НАСТРОЙКИ =====
@@ -1115,6 +1615,7 @@
                 if (currentUser) {
                     settingsUsername.value = currentUser.name || '';
                     settingsDescription.value = currentUser.description || '';
+                    settingsAvatar.value = currentUser.avatar || '';
                     setSettingsStatus('⚙️ Настройки загружены');
                 }
             }
@@ -1126,6 +1627,7 @@
                 }
                 const newName = settingsUsername.value.trim();
                 const newDesc = settingsDescription.value.trim();
+                const newAvatar = settingsAvatar.value.trim();
                 if (!newName) {
                     setSettingsStatus('❌ Имя не может быть пустым', false);
                     return;
@@ -1151,7 +1653,8 @@
                         .from('user_scores')
                         .update({
                             name: newName,
-                            description: newDesc
+                            description: newDesc,
+                            avatar: newAvatar
                         })
                         .eq('id', currentUser.id);
                     if (error) {
@@ -1161,9 +1664,11 @@
                     }
                     currentUser.name = newName;
                     currentUser.description = newDesc;
+                    currentUser.avatar = newAvatar;
                     localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
                     setSettingsStatus('✅ Профиль обновлён!');
                     refreshLeaderboard();
+                    loadChat();
                     return true;
                 } catch (e) { console.error(e);
                     setSettingsStatus('❌ Исключение', false); return false; }
@@ -1183,7 +1688,6 @@
                     else {
                         currentUser.score = currentScore;
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
-                        // Обновляем общий счёт и лидерборд реже
                         refreshTotalScore();
                         refreshLeaderboard();
                     }
@@ -1191,12 +1695,10 @@
             }
 
             // ===== ОБРАБОТЧИКИ =====
-            // Клик по бургеру — без анимации
             burger.addEventListener('click', () => {
                 currentScore += 1;
                 updateScoreUI();
 
-                // Отложенное автосохранение (не чаще раза в секунду)
                 if (saveTimeout) clearTimeout(saveTimeout);
                 saveTimeout = setTimeout(() => {
                     autoSave();
@@ -1204,25 +1706,24 @@
                 }, 1000);
             });
 
-            // Регистрация
             document.getElementById('registerBtn').addEventListener('click', async () => {
                 const name = document.getElementById('regUsername').value.trim();
                 const pass = document.getElementById('regPassword').value.trim();
                 await registerUser(name, pass);
             });
 
-            // Вход
             document.getElementById('loginBtn').addEventListener('click', async () => {
                 const name = document.getElementById('regUsername').value.trim();
                 const pass = document.getElementById('regPassword').value.trim();
                 await loginUser(name, pass);
             });
 
-            // Выход
             document.getElementById('logoutBtn').addEventListener('click', logoutUser);
-
-            // Обновить настройки
             document.getElementById('updateSettingsBtn').addEventListener('click', updateSettings);
+            document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') sendMessage();
+            });
 
             // ===== ВОССТАНОВЛЕНИЕ СЕССИИ =====
             async function restoreSession() {
@@ -1232,7 +1733,7 @@
                         const user = JSON.parse(saved);
                         const { data, error } = await supabase
                             .from('user_scores')
-                            .select('id, name, description, score')
+                            .select('id, name, description, avatar, privileges, score')
                             .eq('id', user.id)
                             .maybeSingle();
                         if (error || !data) {
@@ -1240,12 +1741,15 @@
                             showAuthBlock(true);
                             refreshLeaderboard();
                             refreshTotalScore();
+                            loadChat();
                             return;
                         }
                         currentUser = {
                             id: data.id,
                             name: data.name,
                             description: data.description || '',
+                            avatar: data.avatar || '',
+                            privileges: data.privileges || [],
                             score: data.score || 0
                         };
                         currentScore = currentUser.score || 0;
@@ -1255,43 +1759,43 @@
                         loadSettings();
                         refreshLeaderboard();
                         refreshTotalScore();
+                        loadChat();
                     } catch (e) {
                         console.warn('Ошибка восстановления сессии');
                         localStorage.removeItem(STORAGE_KEY);
                         showAuthBlock(true);
                         refreshLeaderboard();
                         refreshTotalScore();
+                        loadChat();
                     }
                 } else {
                     showAuthBlock(true);
                     refreshLeaderboard();
                     refreshTotalScore();
+                    loadChat();
                 }
             }
 
             // ===== ИНИЦИАЛИЗАЦИЯ =====
             restoreSession();
 
-            // Автосохранение каждые 15 секунд
             setInterval(autoSave, 15000);
-
-            // Обновление лидерборда и общего счёта каждые 30 секунд (реже)
             setInterval(() => {
                 refreshLeaderboard();
                 refreshTotalScore();
             }, 30000);
+            setInterval(loadChat, 10000);
 
-            // При загрузке страницы подгружаем актуальные данные
             window.addEventListener('load', () => {
                 if (currentUser) {
                     loadSettings();
                 }
                 refreshLeaderboard();
                 refreshTotalScore();
+                loadChat();
             });
 
         })();
     </script>
-
 </body>
 </html>
