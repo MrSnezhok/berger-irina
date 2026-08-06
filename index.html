@@ -194,7 +194,7 @@
             pointer-events: none;
         }
 
-        /* ===== СЧЁТ НАД БУРГЕРОМ ===== */
+        /* ===== СЧЁТ НАД БУРГЕРОМ (всего бургеров) ===== */
         .burger-score-overlay {
             position: absolute;
             top: -20px;
@@ -306,14 +306,6 @@
         }
         .btn-logout:hover {
             background: #c85f55;
-        }
-
-        .btn-save {
-            background: #4d8a5a;
-            color: #fff;
-        }
-        .btn-save:hover {
-            background: #5b9e6a;
         }
 
         .status {
@@ -520,6 +512,28 @@
             text-overflow: ellipsis;
         }
 
+        /* ===== ОБЩИЙ СЧЁТ ВСЕХ ИГРОКОВ ===== */
+        .total-score {
+            background: #1a1a1a;
+            border-radius: 30px;
+            padding: 16px 20px;
+            margin: 20px 0 30px;
+            border: 1px solid #333;
+            text-align: center;
+        }
+
+        .total-score .total-label {
+            color: #aaa;
+            font-size: 1.1rem;
+        }
+
+        .total-score .total-value {
+            color: #ffcc00;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-left: 12px;
+        }
+
         /* ===== ГАЛЕРЕЯ ===== */
         .gallery-title {
             text-align: center;
@@ -628,6 +642,9 @@
             .settings-row label {
                 min-width: auto;
             }
+            .total-score .total-value {
+                font-size: 1.6rem;
+            }
         }
     </style>
 </head>
@@ -676,10 +693,16 @@
             <h3>🍔 НАЖМИ НА БУРГЕР</h3>
             <div class="clicker-sub">Каждый клик — +1 бургер в копилку Ирины</div>
             <div class="burger-wrapper" id="burgerClicker">
-                <div class="burger-score-overlay" id="burgerOverlay">+0</div>
+                <div class="burger-score-overlay" id="burgerOverlay">0</div>
                 <img src="burger.png" alt="Бургер" id="burgerImg"
                 onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ccircle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23d49c6c%22/%3E%3Ctext x=%2225%22 y=%2265%22 font-size=%2232%22 fill=%22%233d2b1a%22%3E🍔%3C/text%3E%3C/svg%3E'">
             </div>
+        </div>
+
+        <!-- ===== ОБЩИЙ СЧЁТ ВСЕХ ИГРОКОВ ===== -->
+        <div class="total-score">
+            <span class="total-label">🌍 Всего бургеров натапано в мире:</span>
+            <span class="total-value" id="totalScoreDisplay">0</span>
         </div>
 
         <!-- ===== АВТОРИЗАЦИЯ / НАСТРОЙКИ ===== -->
@@ -903,9 +926,10 @@
             console.log('✅ Supabase подключен');
 
             // ===== СОСТОЯНИЕ =====
-            let currentUser = null; // { id, name, description, score }
+            let currentUser = null;
             let currentScore = 0;
             const STORAGE_KEY = 'burger_irina_session';
+            let totalScore = 0;
 
             // ===== DOM =====
             const scoreDisplay = document.getElementById('scoreDisplay');
@@ -914,6 +938,7 @@
             const leaderboardBody = document.getElementById('leaderboardBody');
             const burger = document.getElementById('burgerClicker');
             const burgerOverlay = document.getElementById('burgerOverlay');
+            const totalScoreDisplay = document.getElementById('totalScoreDisplay');
 
             const authBlock = document.getElementById('authBlock');
             const accountSettings = document.getElementById('accountSettings');
@@ -924,6 +949,7 @@
             // ===== UI =====
             function updateScoreUI() {
                 scoreDisplay.textContent = currentScore;
+                burgerOverlay.textContent = currentScore;
             }
 
             function setAuthStatus(text, isOk = true) {
@@ -979,6 +1005,20 @@
                 leaderboardBody.innerHTML = html;
             }
 
+            // ===== ОБЩИЙ СЧЁТ =====
+            async function refreshTotalScore() {
+                try {
+                    const { data, error } = await supabase
+                        .from('user_scores')
+                        .select('score');
+                    if (error) { console.error(error); return; }
+                    if (data) {
+                        totalScore = data.reduce((sum, row) => sum + (row.score || 0), 0);
+                        totalScoreDisplay.textContent = totalScore;
+                    }
+                } catch (e) { console.error(e); }
+            }
+
             // ===== РЕГИСТРАЦИЯ / ВХОД =====
             async function registerUser(username, password) {
                 if (!username || !password) {
@@ -1016,6 +1056,7 @@
                     showAuthBlock(false);
                     loadSettings();
                     refreshLeaderboard();
+                    refreshTotalScore();
                     return true;
                 } catch (e) { console.error(e);
                     setAuthStatus('❌ Исключение', false); return false; }
@@ -1052,6 +1093,7 @@
                     showAuthBlock(false);
                     loadSettings();
                     refreshLeaderboard();
+                    refreshTotalScore();
                     return true;
                 } catch (e) { console.error(e);
                     setAuthStatus('❌ Исключение', false); return false; }
@@ -1065,6 +1107,7 @@
                 localStorage.removeItem(STORAGE_KEY);
                 showAuthBlock(true);
                 refreshLeaderboard();
+                refreshTotalScore();
             }
 
             // ===== НАСТРОЙКИ =====
@@ -1088,7 +1131,6 @@
                     return;
                 }
 
-                // Проверка, не занято ли имя другим пользователем
                 if (newName !== currentUser.name) {
                     const { data: existing, error } = await supabase
                         .from('user_scores')
@@ -1128,6 +1170,8 @@
             }
 
             // ===== АВТОСОХРАНЕНИЕ =====
+            let saveTimeout = null;
+
             async function autoSave() {
                 if (!currentUser) return;
                 try {
@@ -1139,27 +1183,25 @@
                     else {
                         currentUser.score = currentScore;
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(currentUser));
+                        // Обновляем общий счёт и лидерборд реже
+                        refreshTotalScore();
+                        refreshLeaderboard();
                     }
                 } catch (e) { console.error(e); }
             }
 
             // ===== ОБРАБОТЧИКИ =====
-            // Клик по бургеру
-            let clickCount = 0;
+            // Клик по бургеру — без анимации
             burger.addEventListener('click', () => {
                 currentScore += 1;
                 updateScoreUI();
-                // Анимация оверлея
-                clickCount++;
-                burgerOverlay.textContent = `+${clickCount}`;
-                burgerOverlay.style.transform = 'translateX(-50%) scale(1.2)';
-                setTimeout(() => {
-                    burgerOverlay.style.transform = 'translateX(-50%) scale(1)';
-                }, 150);
-                // Автосохранение после клика (раз в 5 кликов для оптимизации)
-                if (clickCount % 5 === 0) {
+
+                // Отложенное автосохранение (не чаще раза в секунду)
+                if (saveTimeout) clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => {
                     autoSave();
-                }
+                    saveTimeout = null;
+                }, 1000);
             });
 
             // Регистрация
@@ -1197,6 +1239,7 @@
                             localStorage.removeItem(STORAGE_KEY);
                             showAuthBlock(true);
                             refreshLeaderboard();
+                            refreshTotalScore();
                             return;
                         }
                         currentUser = {
@@ -1211,26 +1254,32 @@
                         showAuthBlock(false);
                         loadSettings();
                         refreshLeaderboard();
+                        refreshTotalScore();
                     } catch (e) {
                         console.warn('Ошибка восстановления сессии');
                         localStorage.removeItem(STORAGE_KEY);
                         showAuthBlock(true);
                         refreshLeaderboard();
+                        refreshTotalScore();
                     }
                 } else {
                     showAuthBlock(true);
                     refreshLeaderboard();
+                    refreshTotalScore();
                 }
             }
 
             // ===== ИНИЦИАЛИЗАЦИЯ =====
             restoreSession();
 
-            // Автосохранение каждые 10 секунд
-            setInterval(autoSave, 10000);
+            // Автосохранение каждые 15 секунд
+            setInterval(autoSave, 15000);
 
-            // Обновление лидерборда каждые 15 секунд
-            setInterval(refreshLeaderboard, 15000);
+            // Обновление лидерборда и общего счёта каждые 30 секунд (реже)
+            setInterval(() => {
+                refreshLeaderboard();
+                refreshTotalScore();
+            }, 30000);
 
             // При загрузке страницы подгружаем актуальные данные
             window.addEventListener('load', () => {
@@ -1238,6 +1287,7 @@
                     loadSettings();
                 }
                 refreshLeaderboard();
+                refreshTotalScore();
             });
 
         })();
